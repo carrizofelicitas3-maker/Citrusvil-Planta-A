@@ -1,501 +1,199 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Simulación: Llenado de cámaras de frío y despacho</title>
-  <style>
-    :root { --bg: #0f1b2a; --card: #16233a; --text: #e9f0f8; --accent: #4cc9f0; }
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: Arial, sans-serif; background: #f4f7fb; color: #111; }
-    header { padding: 16px; background: #1e2a3a; color: white; display: flex; align-items: center; justify-content: space-between; }
-    header h1 { margin: 0; font-size: 1.1rem; }
-    main { padding: 16px; display: grid; grid-template-columns: 360px 1fr; gap: 16px; }
-    section.card { background: white; border-radius: 8px; padding: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.08); }
-    h2 { font-size: 1rem; margin: 8px 0 12px; }
-    label { display: block; margin: 8px 0 4px; font-size: 0.92em; color: #333; }
-    input[type="number"] { padding: 6px 8px; width: 100%; border: 1px solid #ccc; border-radius: 4px; }
-    button { padding: 8px 12px; border: none; border-radius: 6px; background: #4cc9f0; color: white; cursor: pointer; margin-right: 6px; }
-    button.secondary { background: #6c757d; }
-    .row { display:flex; gap:8px; align-items:center; }
-    canvas { width: 100% !important; max-width: 720px; height: 240px !important; }
-    #log { white-space: pre-wrap; background: #f7f7f7; border: 1px solid #eee; padding: 8px; height: 120px; overflow:auto; border-radius: 6px; margin-top: 8px; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    @media (max-width: 900px) {
-      main { grid-template-columns: 1fr; }
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Simulador Logístico Citrusvil - Cámaras 6-11</title>
+    <style>
+        :root { --bg: #0f172a; --accent: #38bdf8; --card: #ffffff; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f1f5f9; color: #1e293b; }
+        header { background: var(--bg); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        main { display: grid; grid-template-columns: 350px 1fr; gap: 20px; padding: 20px; }
+        .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        h2 { font-size: 1.1rem; margin-top: 0; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+        label { display: block; margin: 10px 0 5px; font-weight: 600; font-size: 0.85rem; }
+        input { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; margin-bottom: 10px; }
+        button { background: #0284c7; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 10px; }
+        button:hover { background: #0369a1; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-val { display: block; font-size: 1.5rem; font-weight: bold; color: #0284c7; }
+        .stat-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; }
+        #log { background: #1e293b; color: #34d399; font-family: monospace; padding: 15px; height: 300px; overflow-y: auto; border-radius: 8px; font-size: 0.8rem; line-height: 1.4; }
+        .camara-status { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .progress-bar { flex-grow: 1; background: #e2e8f0; height: 12px; border-radius: 6px; overflow: hidden; }
+        .progress-fill { background: #38bdf8; height: 100%; transition: width 0.3s; }
+    </style>
 </head>
 <body>
-  <header>
+
+<header>
     <div>
-      <strong>Simulación: Llenado de cámaras de frío y despacho</strong>
-      <div style="font-size:12px; color:#cbd5e1;">Página web estática • no requiere descarga</div>
+        <strong>Citrusvil S.A.</strong> | Simulador de Gestión de Stock
     </div>
-    <div class="row">
-      <button id="runBtn" title="Ejecutar simulación">Ejecutar simulación</button>
-      <button id="resetBtn" class="secondary" title="Reiniciar">Reiniciar</button>
-    </div>
-  </header>
+    <div style="font-size: 0.8rem;">Cámaras 6 a 11 • Superpallets</div>
+</header>
 
-  <main>
-    <!-- Panel de configuración -->
-    <section class="card" aria-label="Configuración de simulación">
-      <h2>Configuración</h2>
+<main>
+    <section class="card">
+        <h2>Configuración Operativa</h2>
+        <label>Días a simular:</label>
+        <input type="number" id="simDays" value="15">
+        
+        <label>Producción diaria (SP):</label>
+        <input type="number" id="prodDaily" value="45">
+        
+        <label>Camiones disponibles:</label>
+        <input type="number" id="trucksAvailable" value="3">
+        
+        <label>Tiempo ciclo Interplanta (Horas):</label>
+        <input type="number" id="cycleTime" value="1.5" step="0.1">
 
-      <div class="grid-2">
-        <div>
-          <label>Tiempo de simulación (horas):</label>
-          <input type="number" id="simTime" value="24" step="1" min="1"/>
-        </div>
-        <div>
-          <label>Número de montacargas:</label>
-          <input type="number" id="nForklifts" value="2" min="1" max="6"/>
-        </div>
-      </div>
-
-      <div class="grid-2" style="margin-top:8px;">
-        <div>
-          <label>Tasa de llegada (tambores por hora):</label>
-          <input type="number" id="arrivalRate" value="2" step="0.1" min="0.1"/>
-        </div>
-        <div>
-          <label>Tiempo medio de almacenamiento (horas):</label>
-          <input type="number" id="storageMean" value="0.5" step="0.1" min="0.05"/>
-        </div>
-      </div>
-
-      <div class="grid-2" style="margin-top:8px;">
-        <div>
-          <label>Tiempo medio de despacho (horas por tambor):</label>
-          <input type="number" id="dispatchMean" value="0.25" step="0.05" min="0.05"/>
-        </div>
-        <div>
-          <label>Capacidades de cámaras (una por cámara). </label>
-          <div id="cameraInputs" class="row" style="flex-wrap:wrap;">
-            <!-- Campos de capacidad generados dinámicamente -->
-          </div>
-        </div>
-      </div>
-
-      <div id="logTitle" style="margin-top:10px; font-size:12px; color:#555;">
-        Nota: la simulación asume procesos en segundos a modo de horas (escala de tiempo ficticia para animación en el navegador).
-      </div>
+        <button id="startSim">Ejecutar Simulación</button>
+        <div id="statusIndicator" style="text-align: center; font-size: 0.8rem; color: #64748b;">Esperando inicio...</div>
     </section>
 
-    <!-- Visualización -->
-    <section class="card" aria-label="Resultados">
-      <h2>Resultados</h2>
-      <canvas id="occChart" height="240"></canvas>
-      <div id="summary" style="margin-top:12px;">
-        <strong>Resumen:</strong>
-        <ul id="summaryList" style="margin:0; padding-left:20px;">
-          <li>Despachos realizados: <span id="despachados">0</span></li>
-          <li>Tiempo promedio de almacenamiento: <span id="avgStorage">0</span> h</li>
-        </ul>
-      </div>
-      <div id="log" aria-label="Registro de eventos" style="margin-top:10px;"></div>
+    <section>
+        <div class="stats-grid">
+            <div class="stat-box">
+                <span class="stat-label">Total Producido</span>
+                <span class="stat-val" id="totalProd">0</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Viajes Interplanta</span>
+                <span class="stat-val" id="totalTrips">0</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Aprobado Cliente (Frío)</span>
+                <span class="stat-val" id="totalReady">0</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-label">Ocupación Total</span>
+                <span class="stat-val" id="totalOccupancy">0%</span>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 20px;">
+            <h2>Estado de Cámaras (Capacidad: 180 SP c/u)</h2>
+            <div id="camerasContainer"></div>
+        </div>
+
+        <div id="log"></div>
     </section>
-  </main>
+</main>
 
-  <!-- Bibliotecas (CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const LOG_EL = document.getElementById('log');
+    const CAMERAS_DIV = document.getElementById('camerasContainer');
+    
+    // Configuración Citrusvil fija
+    const CAMERAS_IDS = [6, 7, 8, 9, 10, 11];
+    const CAP_MAX = 180;
+    const COLD_HOURS = 240; // 10 días
 
-  <script>
-    // -----------------------------
-    // Simulación en una página única
-    // DES (discrete-event simulation) simplificado en JS
-    // -----------------------------
+    let state = {
+        time: 0,
+        prodTotal: 0,
+        tripsTotal: 0,
+        trucksInUse: 0,
+        cameras: [],
+        events: []
+    };
 
-    // Utiles
-    function expo(mean) {
-      // Media = mean. Muestra de distribución exponencial
-      return -Math.log(1 - Math.random()) * mean;
+    function initSim() {
+        state.cameras = CAMERAS_IDS.map(id => ({
+            id,
+            occupied: 0,
+            lotes: [] // {sp: 45, timeIn: 0}
+        }));
+        state.time = 0;
+        state.prodTotal = 0;
+        state.tripsTotal = 0;
+        state.events = [];
+        LOG_EL.innerHTML = "";
     }
 
-    // DOM helpers
-    const runBtn = document.getElementById('runBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const simTimeInput = document.getElementById('simTime');
-    const arrivalRateInput = document.getElementById('arrivalRate');
-    const storageMeanInput = document.getElementById('storageMean');
-    const dispatchMeanInput = document.getElementById('dispatchMean');
-    const nForkliftsInput = document.getElementById('nForklifts');
-    const cameraInputsEl = document.getElementById('cameraInputs');
-    const occChartCtx = document.getElementById('occChart').getContext('2d');
-    const despachadosEl = document.getElementById('despachados');
-    const avgStorageEl = document.getElementById('avgStorage');
-    const summaryListEl = document.getElementById('summaryList');
-    const logEl = document.getElementById('log');
-    const logTitleEl = document.getElementById('logTitle');
+    function addLog(msg) {
+        const timeStr = `[Día ${(state.time/24).toFixed(1)}]`;
+        LOG_EL.innerHTML += `<div>${timeStr} ${msg}</div>`;
+        LOG_EL.scrollTop = LOG_EL.scrollHeight;
+    }
 
-    // Estado de configuración
-    // Capacidad por cámara (inicial 3 cámaras)
-    const defaultCapacities = [10, 8, 12];
-    let cameras = []; // [{id, capacity, occupied, lastTime, accumOccupancy}]
-    let drumCounter = 0;
-    let drums = {}; // drumId -> {cameraId, storageStart}
-    let blocked = []; // tambores esperando espacio
-    let readyQueue = []; // tambores listos para despacho
-    let totalDespachados = 0;
+    function updateUI() {
+        document.getElementById('totalProd').innerText = state.prodTotal;
+        document.getElementById('totalTrips').innerText = state.tripsTotal;
+        
+        let totalOcc = 0;
+        let readyToShip = 0;
+        CAMERAS_DIV.innerHTML = "";
 
-    // Control de recursos
-    let forkliftAvailable = 0;
+        state.cameras.forEach(cam => {
+            totalOcc += cam.occupied;
+            const approved = cam.lotes.filter(l => (state.time - l.timeIn) >= COLD_HOURS).reduce((a,b) => a + b.sp, 0);
+            readyToShip += approved;
 
-    // Métricas de tiempo
-    let currentTime = 0; // horas en simulación
-    let events = []; // cola de eventos: {time, type, drumId}
-
-    // Registro de almacenamiento
-    let storageTimes = []; // tiempos de almacenamiento por tambor
-
-    // Gráficos
-    let occChart = null;
-
-    // Inicializar cámara panel
-    function renderCameraInputs() {
-      cameraInputsEl.innerHTML = '';
-      cameras.forEach((cam, idx) => {
-        const div = document.createElement('div');
-        div.style.display = 'flex';
-        div.style.alignItems = 'center';
-        div.style.gap = '8px';
-        div.style.marginRight = '6px';
-        div.innerHTML = `
-          <label style="min-width: 220px;">Cámara C${cam.id} - capacidad:</label>
-          <input type="number" value="${cam.capacity}" min="1" data-index="${idx}" style="width: 90px;" />
-        `;
-        cameraInputsEl.appendChild(div);
-      });
-      // Añade un listener para cambios de capacidad
-      cameraInputsEl.querySelectorAll('input[type="number"]').forEach(inp => {
-        inp.addEventListener('change', () => {
-          const idx = parseInt(inp.getAttribute('data-index'));
-          const val = Math.max(1, parseInt(inp.value || '1'));
-          cameras[idx].capacity = val;
-          // Update internal UI si se desea
+            const perc = (cam.occupied / CAP_MAX) * 100;
+            CAMERAS_DIV.innerHTML += `
+                <div class="camara-status">
+                    <div style="width:80px; font-weight:bold;">Cámara ${cam.id}</div>
+                    <div class="progress-bar"><div class="progress-fill" style="width:${perc}%"></div></div>
+                    <div style="width:120px; font-size:0.8rem; text-align:right;">${cam.occupied}/180 SP</div>
+                </div>
+            `;
         });
-      });
+
+        document.getElementById('totalReady').innerText = readyToShip;
+        document.getElementById('totalOccupancy').innerText = ((totalOcc / (180*6))*100).toFixed(1) + "%";
     }
 
-    // Construye configuración inicial
-    function initConfiguration() {
-      // Reset
-      cameras = [];
-      for (let i = 0; i < defaultCapacities.length; i++) {
-        cameras.push({
-          id: i + 1,
-          capacity: defaultCapacities[i],
-          occupied: 0,
-          lastTime: 0,
-          accumOccupancy: 0
-        });
-      }
-      renderCameraInputs();
-      // Detalles de UI
-      logEl.textContent = '';
-      logTitleEl.style.display = 'block';
-    }
+    function runSim() {
+        initSim();
+        const maxDays = parseInt(document.getElementById('simDays').value);
+        const prodPerDay = parseInt(document.getElementById('prodDaily').value);
+        const maxTrucks = parseInt(document.getElementById('trucksAvailable').value);
+        const cycleTime = parseFloat(document.getElementById('cycleTime').value);
 
-    // Helpers para eventos
-    function scheduleEvent(time, type, drumId) {
-      events.push({ time, type, drumId });
-      events.sort((a, b) => a.time - b.time);
-    }
+        addLog("Iniciando ciclo operativo Citrusvil...");
 
-    function now() { return currentTime; }
+        for (let day = 0; day < maxDays; day++) {
+            state.time = day * 24;
+            
+            // 1. Entrada de Producción
+            let spRestante = prodPerDay;
+            state.prodTotal += prodPerDay;
 
-    function updateCameraOccupancy(cam, newOccupied, time) {
-      const deltaTime = time - cam.lastTime;
-      cam.accumOccupancy += cam.occupied * deltaTime;
-      cam.lastTime = time;
-      cam.occupied = newOccupied;
-    }
-
-    function log(msg) {
-      logEl.textContent += msg + "\n";
-      logEl.scrollTop = logEl.scrollHeight;
-    }
-
-    // Controladores de simulación
-    function placeTamborInCamera(drumId, cam, time) {
-      drumCounter;
-      drums[drumId] = drums[drumId] || {};
-      drums[drumId].cameraId = cam.id;
-      drums[drumId].storageStart = time;
-      updateCameraOccupancy(cam, cam.occupied + 1, time);
-      // Programar almacenamiento -> despacho
-      const storageMean = parseFloat(storageMeanInput.value);
-      const tStorage = expo(storageMean); // en horas
-      scheduleEvent(time + tStorage, 'storage_end', drumId);
-      log(`Hora ${time.toFixed(2)}: Tambor ${drumId} colocado en C${cam.id} (capacidad=${cam.capacity}, ocupación=${cam.occupied})`);
-    }
-
-    function tryPlaceBlocked(time) {
-      // Intentar colocar tambores que estaban bloqueados
-      if (blocked.length === 0) return;
-      // Buscar cámara con espacio
-      let placedAny = false;
-      for (let i = 0; i < blocked.length; i++) {
-        const drumId = blocked[i];
-        const cam = cameras.find(c => c.occupied < c.capacity);
-        if (!cam) break;
-        // quitar de blocked
-        blocked.splice(i, 1);
-        // colocar
-        drums[drumId] = drums[drumId] || {};
-        drums[drumId].cameraId = cam.id;
-        drums[drumId].storageStart = time;
-        updateCameraOccupancy(cam, cam.occupied + 1, time);
-        const storageMean = parseFloat(storageMeanInput.value);
-        const tStorage = expo(storageMean);
-        scheduleEvent(time + tStorage, 'storage_end', drumId);
-        log(`Hora ${time.toFixed(2)}: Tambor bloqueado ${drumId} colocado en C${cam.id} (nuevo ocupación=${cam.occupied})`);
-        placedAny = true;
-        // continuar buscando
-        i--; // since we removed current item
-      }
-      if (placedAny) {
-        // Después de colocar uno o más, intentar despacho si procede
-        attemptDispatch(time);
-      }
-    }
-
-    function attemptDispatch(time) {
-      // Despacho mientras haya tambores listos y montacargas disponibles
-      const nForks = parseInt(nForkliftsInput.value) || 1;
-      forkliftAvailable = Math.max(0, Math.min(nForks, 999)); // inicial ajuste
-      // Ajusta variable de disponibilidad a diario: contamos despachos en progreso con un reloj simplificado
-      // Para simplicidad, mantenemos un contador de despachos en progreso separado
-      // En este prototipo, creamos despachos explícitos en 'dispatch_end'
-      // Este helper se invoca cuando puedas iniciar despachos
-      while (readyQueue.length > 0 && forkliftAvailable > 0) {
-        const drumId = readyQueue.shift();
-        const drum = drums[drumId];
-        const cam = cameras.find(c => c.id === drum.cameraId);
-        if (!cam) {
-          // error
-          continue;
-        }
-        forkliftAvailable--;
-        scheduleEvent(time, 'dispatch_start', drumId);
-        // Despacho terminará en time + dispatchMean
-        const dispatchMean = parseFloat(dispatchMeanInput.value);
-        const tDispatch = expo(dispatchMean);
-        scheduleEvent(time + tDispatch, 'dispatch_end', drumId);
-        log(`Hora ${time.toFixed(2)}: Inicio despacho tambor ${drumId} desde C${cam.id} (duración ~${tDispatch.toFixed(2)} h)`);
-      }
-    }
-
-    // Eventos principales
-    function processEvent(e) {
-      const type = e.type;
-      const t = e.time;
-      currentTime = t;
-      switch (type) {
-        case 'arrival': {
-          // Llegó un tambor
-          const drumId = e.drumId;
-          // Buscar cámara con espacio
-          const cam = cameras.find(c => c.occupied < c.capacity);
-          if (cam) {
-            placeTamborInCamera(drumId, cam, t);
-            // Programar próxima llegada
-            const arrivalRate = parseFloat(arrivalRateInput.value) || 1;
-            const inter = expo(1 / arrivalRate);
-            scheduleEvent(t + inter, 'arrival', drumId + 1); // el siguiente tambor se crea cuando llega este, ID incrementa
-          } else {
-            // bloqueo: sin espacio ahora
-            blocked.push(drumId);
-            log(`Hora ${t.toFixed(2)}: Tamor ${drumId} bloqueado (sin espacio)`);
-            // intentos periódicos para desbloquear
-            scheduleEvent(t + 0.25, 'check_blocked');
-          }
-          break;
-        }
-        case 'storage_end': {
-          // Tambor termina almacenamiento y está listo para despacho
-          const drumId = e.drumId;
-          const drum = drums[drumId];
-          if (!drum) {
-            break;
-          }
-          // Añadir a despacho si hay espacio
-          readyQueue.push(drumId);
-          log(`Hora ${t.toFixed(2)}: Tambor ${drumId} listo para despacho (C${drum.cameraId})`);
-          // Intentar despacho
-          attemptDispatch(t);
-          // Intenta colocar desde bloqueados si hay espacio
-          tryPlaceBlocked(t);
-          break;
-        }
-        case 'dispatch_end': {
-          // Despacho finalizado
-          const drumId = e.drumId;
-          const drum = drums[drumId];
-          if (!drum) break;
-          const cam = cameras.find(c => c.id === drum.cameraId);
-          if (cam) {
-            // Liberar espacio de la cámara
-            updateCameraOccupancy(cam, cam.occupied - 1, t);
-            log(`Hora ${t.toFixed(2)}: Despachado tambor ${drumId} desde C${cam.id} (ocupación=${cam.occupied})`);
-          }
-          totalDespachados++;
-          // Calcular almacenamiento real
-          const storageTime = (typeof drum.storageStart === 'number') ? (t - drum.storageStart) : 0;
-          storageTimes.push(storageTime);
-          // Limpiar tambor
-          delete drums[drumId];
-          // Liberar montacargas
-          forkliftAvailable++;
-          // Intentar nuevos despachos
-          attemptDispatch(t);
-          // Intentar desbloquear bloques si existían
-          tryPlaceBlocked(t);
-          break;
-        }
-        case 'check_blocked': {
-          // Intentar colocar tambores bloqueados
-          tryPlaceBlocked(t);
-          break;
-        }
-        default:
-          break;
-      }
-    }
-
-    // Ejecutar simulación
-    function runSimulation() {
-      // Reiniciar estado
-      logEl.textContent = '';
-      currentTime = 0;
-      drumCounter = 0;
-      drums = {};
-      blocked = [];
-      readyQueue = [];
-      storageTimes = [];
-      totalDespachados = 0;
-
-      // Inicializar cámaras (en caso de cambios en UI)
-      CamerasInitFromUI();
-
-      // Preparar eventos
-      events = [];
-      // Primer tambor llega de forma aleatoria
-      const simTime = parseFloat(simTimeInput.value) || 24;
-      const arrivalRate = parseFloat(arrivalRateInput.value) || 1;
-      // Primer arrival
-      // Generamos el primer tambor
-      drumCounter = 1;
-      // Crear primer tambor en llegada
-      // Utilizamos events con tipo 'arrival'
-      scheduleEvent(0 + expo(1 / arrivalRate), 'arrival', drumCounter);
-
-      // Ejecutar bucle de eventos
-      while (events.length > 0 && currentTime <= simTime) {
-        const ev = events.shift();
-        processEvent(ev);
-      }
-
-      // Si quedan eventos al terminar el tiempo simulado, los podemos ignorar o acumular hasta terminar
-      // Cálculos de métricas
-      const simTimeActual = Math.max(0, Math.min(simTime, currentTime));
-      // Ocupación promedio por cámara
-      const occupancyAverages = cameras.map(cam => {
-        // En caso de terminar, acumulOccupancy debe contener el tiempo ponderado
-        const totalTime = simTimeActual;
-        const avgOcc = (simTimeActual > 0) ? cam.accumOccupancy / simTimeActual : 0;
-        return { id: cam.id, avgOcc };
-      });
-
-      // Desplegar resultados
-      despachadosEl.textContent = totalDespachados.toString();
-      const avgStorage = (storageTimes.length > 0) ? (storageTimes.reduce((a,b)=>a+b,0)/storageTimes.length) : 0;
-      avgStorageEl.textContent = avgStorage.toFixed(2);
-
-      // Gráfico de ocupación
-      renderOccupancyChart(occupancyAverages);
-
-      // Resumen rápido
-      summaryListEl.innerHTML = `
-        <li>Despachos realizados: <strong>${totalDespachados}</strong></li>
-        <li>Tiempo promedio de almacenamiento: <strong>${avgStorage.toFixed(2)}</strong> h</li>
-        <li>Ocupación media por cámara (horas): ${occupancyAverages.map(o => `C${o.id}: ${o.avgOcc.toFixed(2)}`).join(', ')}</li>
-      `;
-    }
-
-    // Construye cámaras desde la UI (si el usuario cambió capacidades)
-    function CamerasInitFromUI() {
-      // Si hay inputs especiales para cámaras, reconstruimos la lista
-      // En este ejemplo, mantenemos 3 cámaras por defecto si no hay cambios.
-      // Aquí podrías leer valores de inputs dinámicos si añadieras más cámaras.
-      // Por simplicidad, asumimos 3 cámaras ya definidas en initConfiguration.
-      // Reconfigurar lastTime y accumOccupancy para cálculo de ocupación
-      cameras.forEach(cam => {
-        if (typeof cam.lastTime !== 'number') cam.lastTime = 0;
-        if (typeof cam.accumOccupancy !== 'number') cam.accumOccupancy = 0;
-      });
-    }
-
-    function renderOccupancyChart(data) {
-      const labels = data.map(d => `C${d.id}`);
-      const values = data.map(d => d.avgOcc);
-
-      if (!occChart) {
-        occChart = new Chart(occChartCtx, {
-          type: 'bar',
-          data: {
-            labels,
-            datasets: [{
-              label: 'Ocupación media (horas)',
-              data: values,
-              backgroundColor: 'rgba(76,201,240,0.6)'
-            }]
-          },
-          options: {
-            scales: {
-              y: { beginAtZero: true, title: { display: true, text: 'Horas / hora (media)' } },
-              x: { title: { display: true, text: 'Cámaras' } }
-            },
-            plugins: {
-              legend: { display: false },
-              title: { display: true, text: 'Ocupación media por cámara' }
+            for (let cam of state.cameras) {
+                if (cam.occupied < CAP_MAX) {
+                    let espacio = CAP_MAX - cam.occupied;
+                    let aIngresar = Math.min(espacio, spRestante);
+                    cam.occupied += aIngresar;
+                    cam.lotes.push({ sp: aIngresar, timeIn: state.time });
+                    spRestante -= aIngresar;
+                    if (aIngresar > 0) addLog(`Ingresan ${aIngresar} SP a Cámara ${cam.id}`);
+                }
+                if (spRestante <= 0) break;
             }
-          }
-        });
-      } else {
-        occChart.data.labels = labels;
-        occChart.data.datasets[0].data = values;
-        occChart.update();
-      }
+
+            if (spRestante > 0) addLog(`⚠️ ALERTA: Sin espacio para ${spRestante} SP`);
+
+            // 2. Lógica Interplanta (Si la cámara tiene al menos 45 SP - 1 día de prod)
+            state.cameras.forEach(cam => {
+                if (cam.occupied >= 45) {
+                    // Simular 9 viajes usando los camiones disponibles
+                    // Tiempo estimado = (9 viajes * ciclo) / camiones
+                    let tiempoNecesario = (9 * cycleTime) / maxTrucks;
+                    state.tripsTotal += 9;
+                    cam.occupied -= 45; // Se llevan 1 día de producción
+                    addLog(`🚛 Interplanta: 9 viajes realizados desde C${cam.id}. Duración estimada: ${tiempoNecesario.toFixed(1)}h`);
+                }
+            });
+        }
+        updateUI();
+        addLog("Simulación finalizada.");
     }
 
-    // Inicializar configuración y evento de botones
-    function resetUI() {
-      initConfiguration();
-      // Reset gráfico y métricas
-      despachadosEl.textContent = '0';
-      avgStorageEl.textContent = '0';
-      logEl.textContent = '';
-      if (occChart) occChart.destroy(), occChart = null;
-    }
+    document.getElementById('startSim').addEventListener('click', runSim);
+</script>
 
-    // Eventos de UI
-    runBtn.addEventListener('click', () => {
-      runSimulation();
-    });
-
-    resetBtn.addEventListener('click', () => {
-      resetUI();
-    });
-
-    // Inicialización al cargar la página
-    (function bootstrap() {
-      initConfiguration();
-      // Configuración base de 3 cámaras
-      // Cada cámara ya tiene su capacidad cargada en initConfiguration
-    })();
-
-  </script>
 </body>
 </html>
