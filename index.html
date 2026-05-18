@@ -1,76 +1,162 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Simulador Avanzado Citrusvil - Cámaras 6-11</title>
-    <style>
-        :root { --bg: #0f172a; --accent: #38bdf8; --card: #ffffff; }
-        body { margin: 0; font-family: 'Segoe UI', sans-serif; background: #f1f5f9; color: #1e293b; }
-        header { background: var(--bg); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; }
-        main { display: grid; grid-template-columns: 380px 1fr; gap: 20px; padding: 20px; }
-        .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2 { font-size: 1.1rem; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
-        label { display: block; margin: 10px 0 5px; font-weight: 600; font-size: 0.8rem; }
-        input { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
-        button { background: #0284c7; color: white; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; }
-        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-box { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .stat-val { display: block; font-size: 1.4rem; font-weight: bold; color: #0284c7; }
-        .stat-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; }
-        #log { background: #1e293b; color: #34d399; font-family: monospace; padding: 15px; height: 250px; overflow-y: auto; border-radius: 8px; font-size: 0.8rem; }
-        .camara-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-        .progress-bar { flex-grow: 1; background: #e2e8f0; height: 20px; border-radius: 4px; position: relative; }
-        .progress-fill { background: #38bdf8; height: 100%; border-radius: 4px; transition: width 0.5s; }
-        .progress-text { position: absolute; width: 100%; text-align: center; font-size: 0.75rem; font-weight: bold; line-height: 20px; color: #000; }
-        .critical { color: #ef4444; font-weight: bold; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Cámaras 6-11 | Flujo Logístico</title>
+    <!-- Tailwind CSS para diseño rápido -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-6 font-sans">
 
-<header>
-    <strong>Citrusvil S.A. | Stock Dinámico</strong>
-    <span>Cámaras 6 a 11 (Cap. 180 SP c/u)</span>
-</header>
+    <div class="max-w-5xl mx-auto">
+        <!-- Encabezado -->
+        <header class="border-b border-gray-700 pb-4 mb-6">
+            <h1 class="text-3xl font-bold text-yellow-400">Simulador Operativo: Cámaras 6 a 11</h1>
+            <p class="text-gray-400 mt-1">Lógica de llenado, vaciado automático (Interplanta) y stock de pulmón obligatorio.</p>
+        </header>
 
-<main>
-    <section>
-        <div class="card">
-            <h2>Inventario Inicial (SP)</h2>
-            <div class="grid-inputs" id="initialInventory">
+        <!-- Panel de Control y Reglas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 col-span-2">
+                <h2 class="text-xl font-semibold mb-3 text-blue-400">Controles de Simulación</h2>
+                <div class="flex flex-wrap gap-3">
+                    <button id="btn-siguiente" onclick="avanzarPaso()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition shadow-md">
+                        Avanzar Siguiente Paso ▶
+                    </button>
+                    <button onclick="reiniciarSimulacion()" class="bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold py-2 px-4 rounded transition">
+                        Reiniciar
+                    </button>
                 </div>
-        </div>
-        <div class="card">
-            <h2>Configuración</h2>
-            <label>Días a simular:</label>
-            <input type="number" id="simDays" value="15">
-            <label>Producción diaria (SP):</label>
-            <input type="number" id="prodDaily" value="45">
-            <label>Camiones (Interplanta):</label>
-            <input type="number" id="trucks" value="3">
-            <button id="runBtn" style="margin-top:15px;">Ejecutar Simulación</button>
-        </div>
-    </section>
+                <div class="mt-4 p-3 bg-gray-900 rounded border border-gray-700">
+                    <span class="font-bold text-yellow-400">Estado Actual:</span>
+                    <p id="descripcion-estado" class="text-sm mt-1 text-gray-300">Presioná "Avanzar" para iniciar la recepción en la Cámara 6.</p>
+                </div>
+            </div>
 
-    <section>
-        <div class="stats-grid">
-            <div class="stat-box"><span class="stat-label">Total Stock</span><span class="stat-val" id="totalStock">0</span></div>
-            <div class="stat-box"><span class="stat-label">Libre Total</span><span class="stat-val" id="totalFree">0</span></div>
-            <div class="stat-box"><span class="stat-label">Viajes Realizados</span><span class="stat-val" id="totalTrips">0</span></div>
-            <div class="stat-box"><span class="stat-label">Estado Sistema</span><span class="stat-val" id="sysStatus">OK</span></div>
+            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 text-sm">
+                <h2 class="text-base font-semibold mb-2 text-yellow-500">Reglas del Sistema</h2>
+                <ul class="list-disc list-inside space-y-1 text-gray-400">
+                    <li>Secuencia obligatoria de 6 a 11.</li>
+                    <li>Límite de alerta al llenar Cam 9.</li>
+                    <li>Debe haber <span class="text-red-400 font-bold">≥ 2 cámaras vacías</span>.</li>
+                    <li>Vaciado FIFO (Interplanta) desde Cam 6.</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="card">
-            <h2>Ocupación de Cámaras</h2>
-            <div id="camVisuals"></div>
+        <!-- Visualización de Cámaras -->
+        <h2 class="text-xl font-semibold mb-4 text-gray-300">Mapa de Cámaras en Tiempo Real</h2>
+        <div id="contenedor-camaras" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-8">
+            <!-- Las cámaras se generan dinámicamente con JS -->
         </div>
 
-        <div id="log"></div>
-    </section>
-</main>
+        <!-- Referencias de Color -->
+        <div class="flex gap-6 justify-center text-sm bg-gray-800 p-3 rounded-lg border border-gray-700">
+            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-gray-700 rounded"></div> Vacía</div>
+            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-blue-500 rounded animate-pulse"></div> Llenando</div>
+            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-red-600 rounded"></div> Llena</div>
+            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-yellow-500 rounded animate-pulse"></div> Vaciando (Interplanta)</div>
+        </div>
+    </div>
 
-<script>
-    const
+    <!-- Lógica de la Simulación -->
+    <script>
+        const camarasConfig = [6, 7, 8, 9, 10, 11];
+        // Estados posibles: 'vacía', 'llenando', 'llena', 'vaciando'
+        let estadosCamaras = Array(6).fill('vacía');
+        let pasoActual = 0;
+
+        const pasosSimulacion = [
+            {
+                estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
+                desc: "Fase 0: Se inicia la recepción de producto terminado en la Cámara 6."
+            },
+            {
+                estados: ['llena', 'llenando', 'vacía', 'vacía', 'vacía', 'vacía'],
+                desc: "Fase 1: Cámara 6 completada. El flujo pasa automáticamente a la Cámara 7."
+            },
+            {
+                estados: ['llena', 'llena', 'llenando', 'vacía', 'vacía', 'vacía'],
+                desc: "Fase 2: Cámara 7 completada. Se inicia el llenado de la Cámara 8."
+            },
+            {
+                estados: ['llena', 'llena', 'llena', 'llenando', 'vacía', 'vacía'],
+                desc: "Fase 3: Cámara 8 llena. Se empieza a ocupar la Cámara 9. ¡Atención al límite!"
+            },
+            {
+                estados: ['llena', 'llena', 'llena', 'llena', 'vacía', 'vacía'],
+                desc: "💥 CRÍTICO: Se llenó la Cámara 9. Quedan exactamente 2 vacías (10 y 11). Se dispara la orden de INTERPLANTA."
+            },
+            {
+                estados: ['vaciando', 'llena', 'llena', 'llena', 'llenando', 'vacía'],
+                desc: "Fase 4 (Gatillo): Se inicia el vaciado (FIFO) de la Cámara 6 hacia interplanta. En paralelo, la producción llena la Cámara 10."
+            },
+            {
+                estados: ['vacía', 'vaciando', 'llena', 'llena', 'llena', 'llenando'],
+                desc: "Fase 5: La Cámara 6 quedó liberada (vuelve al pulmón). Ahora se vacía la 7 y se empieza a llenar la última disponible (Cámara 11)."
+            },
+            {
+                estados: ['llenando', 'vacía', 'vaciando', 'llena', 'llena', 'llena'],
+                desc: "Fase 6 (Ciclo Continuo): La Cámara 7 se liberó. El llenado vuelve a empezar en la Cámara 6. Se mantiene el flujo constante respetando el colchón de seguridad."
+            }
+        ];
+
+        function renderizarCamaras() {
+            const contenedor = document.getElementById('contenedor-camaras');
+            contenedor.innerHTML = '';
+
+            camarasConfig.forEach((num, index) => {
+                const estado = estadosCamaras[index];
+                let colorClase = 'bg-gray-700 border-gray-600';
+                let textoEstado = 'VACÍA';
+                let BadgeClase = 'bg-gray-600';
+
+                if (estado === 'llenando') {
+                    colorClase = 'bg-blue-900 border-blue-500 ring-2 ring-blue-400';
+                    textoEstado = 'LLENANDO';
+                    BadgeClase = 'bg-blue-500 animate-pulse';
+                } else if (estado === 'llena') {
+                    colorClase = 'bg-red-950 border-red-700';
+                    textoEstado = 'LLENA';
+                    BadgeClase = 'bg-red-600';
+                } else if (estado === 'vaciando') {
+                    colorClase = 'bg-yellow-950 border-yellow-600 ring-2 ring-yellow-400';
+                    textoEstado = 'VACIANDO';
+                    BadgeClase = 'bg-yellow-500 text-gray-900 font-bold animate-pulse';
+                }
+
+                contenedor.innerHTML += `
+                    <div class="border rounded-xl p-4 flex flex-col items-center justify-between min-h-[140px] shadow-lg transition-all duration-300 ${colorClase}">
+                        <span class="text-xs text-gray-400 font-bold">CÁMARA</span>
+                        <span class="text-4xl font-extrabold my-2">${num}</span>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold text-white ${BadgeClase}">${textoEstado}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function avanzarPaso() {
+            if (pasoActual < pasosSimulacion.length) {
+                estadosCamaras = pasosSimulacion[pasoActual].estados;
+                document.getElementById('descripcion-estado').innerText = pasosSimulacion[pasoActual].desc;
+                renderizarCamaras();
+                pasoActual++;
+            } else {
+                document.getElementById('descripcion-estado').innerText = "Fin de la demostración del ciclo. Reiniciando para volver a ver...";
+                pasoActual = 0;
+            }
+        }
+
+        function reiniciarSimulacion() {
+            estadosCamaras = Array(6).fill('vacía');
+            pasoActual = 0;
+            document.getElementById('descripcion-estado').innerText = 'Presioná "Avanzar" para iniciar la recepción en la Cámara 6.';
+            renderizarCamaras();
+        }
+
+        // Render inicial
+        renderizarCamaras();
+    </script>
+</body>
 </html>
