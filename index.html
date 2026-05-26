@@ -4,10 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Citrusvil | Planta A</title>
-    <!-- Tailwind CSS v4 -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* Distribución radial adaptable */
+        /* Distribución radial adaptable y exacta */
         .clock-container {
             position: relative;
             width: 290px;
@@ -25,7 +24,7 @@
             transform: translate(-50%, -50%);
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        /* Posiciones horarias exactas de las 6 cámaras */
+        /* Posiciones horarias de las 6 cámaras */
         .pos-0 { top: 12%; left: 50%; }   /* Cámara 6 */
         .pos-1 { top: 31%; left: 83%; }   /* Cámara 7 */
         .pos-2 { top: 69%; left: 83%; }   /* Cámara 8 */
@@ -38,7 +37,6 @@
 
     <div class="max-w-6xl mx-auto p-4 md:p-8">
         
-        <!-- Encabezado Corporativo Citrusvil (Limpio, sin el tablero arriba) -->
         <header class="border-b border-slate-200 pb-5 mb-6">
             <div class="flex items-center gap-2">
                 <span class="bg-emerald-700 text-white text-[10px] font-black px-2.5 py-0.5 rounded tracking-wider">CITRUSVIL</span>
@@ -49,13 +47,10 @@
             </h1>
         </header>
 
-        <!-- Layout Adaptable (Celular / Computadora) -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             
-            <!-- PANEL IZQUIERDO: Tablero de Control y Consola de Datos -->
             <div class="lg:col-span-7 space-y-5">
                 
-                <!-- Tablero de Control Reubicado -->
                 <div class="grid grid-cols-3 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                     <div class="text-center border-r border-slate-100">
                         <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Ocupación</span>
@@ -71,7 +66,6 @@
                     </div>
                 </div>
 
-                <!-- Consola Operativa -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-4 md:p-6 shadow-sm">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
@@ -81,21 +75,19 @@
                         <span id="contador-dias" class="text-xs font-bold bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-100">Estado Inicial</span>
                     </div>
 
-                    <!-- Botones de Acción adaptables -->
                     <div class="flex gap-3 mb-4">
-                        <button id="btn-siguiente" onclick="avanzarDia()" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl transition shadow-md shadow-emerald-700/10 flex items-center justify-center gap-2 cursor-pointer text-xs md:text-sm tracking-wide">
+                        <button id="btn-siguiente" onclick="avanzarDia()" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3.5 px-4 rounded-xl transition shadow-md shadow-emerald-700/20 flex items-center justify-center gap-2 cursor-pointer text-xs md:text-sm tracking-wide">
                             Avanzar Día Operativo <span>▶</span>
                         </button>
-                        <button onclick="reiniciarSimulacion()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 px-4 rounded-xl transition cursor-pointer text-xs md:text-sm">
+                        <button onclick="reiniciarSimulacion()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 px-4 rounded-xl transition cursor-pointer text-xs md:text-sm">
                             Reiniciar
                         </button>
                     </div>
 
-                    <!-- Métricas de la Operación (Limpio y Técnico) -->
                     <div class="p-4 bg-slate-50 rounded-xl border border-slate-200/60 relative overflow-hidden">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-700"></div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm" id="datos-operacion">
-                            <div class="col-span-1 sm:col-span-2 text-slate-500 italic">
+                            <div class="col-span-1 sm:col-span-2 text-slate-500 italic text-center py-2">
                                 Presioná "Avanzar Día Operativo" para iniciar la simulación del comportamiento de la tasa de llenado y vaciado.
                             </div>
                         </div>
@@ -103,12 +95,10 @@
                 </div>
             </div>
 
-            <!-- PANEL DERECHO: Layout Circular (Visualmente independiente) -->
             <div class="lg:col-span-5 flex flex-col items-center bg-white border border-slate-200 p-4 md:p-6 rounded-2xl shadow-sm">
-                <h3 class="text-[10px] md:text-xs font-bold text-slate-400 mb-4 md:mb-6 tracking-widest uppercase">Layout de Cámaras (Flujo Horario)</h3>
                 
-                <!-- Contenedor Anillo Adaptable -->
-                <div class="clock-container my-2 bg-slate-50 border border-slate-200/80 flex items-center justify-center shadow-inner">
+                <div class="clock-container my-4 bg-slate-50 border border-slate-200/80 flex items-center justify-center shadow-inner">
+                    
                     <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-white border border-slate-200 flex flex-col items-center justify-center text-center p-2 z-10 shadow-sm">
                         <span class="text-[8px] sm:text-[9px] text-slate-400 font-bold tracking-widest">FLUJO</span>
                         <span class="text-[10px] sm:text-xs font-black text-emerald-800 tracking-wider">HORARIO</span>
@@ -116,11 +106,11 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
                         </svg>
                     </div>
+                    
                     <div id="reloj-camaras" class="absolute inset-0 w-full h-full"></div>
                 </div>
 
-                <!-- Referencias de Estado adaptables -->
-                <div class="w-full grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 text-[10px] md:text-[11px] font-medium text-slate-500">
+                <div class="w-full grid grid-cols-2 gap-2 mt-2 pt-4 border-t border-slate-100 text-[10px] md:text-[11px] font-medium text-slate-500">
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/40">
                         <div class="w-2.5 h-2.5 bg-white border border-slate-300 rounded"></div>
                         <span>Disponible</span>
@@ -142,7 +132,6 @@
         </div>
     </div>
 
-    <!-- Lógica Operativa Sincronizada -->
     <script>
         const camarasConfig = [6, 7, 8, 9, 10, 11];
         let diaActual = 0;
@@ -156,52 +145,52 @@
             {
                 dia: "Día 1",
                 estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
-                ingreso: "Cámara 6 (En proceso)", despacho: "Inactivo", balance: "Absorbiendo ritmo de producción."
+                ingreso: "Cámara 6 (En proceso)", despacho: "Inactivo", balance: "Absorbiendo ritmo de producción estándar."
             },
             {
                 dia: "Día 2",
                 estados: ['llena', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
-                ingreso: "Cámara 6 (Completada)", despacho: "Inactivo", balance: "Capacidad de Cámara 6 colmada en 48hs."
+                ingreso: "Cámara 6 (Completada)", despacho: "Inactivo", balance: "Capacidad de Cámara 6 colmada en ventana de 48hs."
             },
             {
                 dia: "Día 3",
                 estados: ['llena', 'llenando', 'vacía', 'vacía', 'vacía', 'vacía'],
-                ingreso: "Cámara 7 (En proceso)", despacho: "Inactivo", balance: "Rotación horaria activa."
+                ingreso: "Cámara 7 (En proceso)", despacho: "Inactivo", balance: "Rotación secuencial interna activa."
             },
             {
                 dia: "Día 4",
                 estados: ['llena', 'llena', 'vacía', 'vacía', 'vacía', 'vacía'],
-                ingreso: "Cámara 7 (Completada)", despacho: "Inactivo", balance: "Segunda cámara colmada en 48hs."
+                ingreso: "Cámara 7 (Completada)", despacho: "Inactivo", balance: "Segunda unidad colmada según ritmo de planta."
             },
             {
                 dia: "Día 5",
                 estados: ['llena', 'llena', 'llenando', 'vacía', 'vacía', 'vacía'],
-                ingreso: "Cámara 8 (En proceso)", despacho: "Inactivo", balance: "Flujo constante sin novedades."
+                ingreso: "Cámara 8 (En proceso)", despacho: "Inactivo", balance: "Acumulación dinámica de stock retenido."
             },
             {
                 dia: "Día 6",
                 estados: ['llena', 'llena', 'llena', 'vacía', 'vacía', 'vacía'],
-                ingreso: "Cámara 8 (Completada)", despacho: "Inactivo", balance: "Ocupación al 50%. Ventana de alerta próxima."
+                ingreso: "Cámara 8 (Completada)", despacho: "Inactivo", balance: "Ocupación física al 50%. Proximidad a umbral técnico."
             },
             {
                 dia: "Día 7",
                 estados: ['llena', 'llena', 'llena', 'llenando', 'vacía', 'vacía'],
-                ingreso: "Cámara 9 (En proceso)", despacho: "Inactivo", balance: "Último espacio buffer antes de gatillo."
+                ingreso: "Cámara 9 (En proceso)", despacho: "Inactivo", balance: "Último bloque buffer libre antes de activar evacuación."
             },
             {
                 dia: "Día 8",
                 estados: ['vaciando', 'llena', 'llena', 'llena', 'llenando', 'vacía'],
-                ingreso: "Cámara 10 (En proceso)", despacho: "Cámara 6 (FIFO Activo)", balance: "Sincronización total: Ritmo de vaciado iguala al de producción."
+                ingreso: "Cámara 10 (En proceso)", despacho: "Cámara 6 (FIFO Activo)", balance: "<strong>Punto de equilibrio alcanzado</strong>: La tasa de evacuación iguala de forma exacta a la producción."
             },
             {
                 dia: "Día 9",
                 estados: ['vacía', 'vaciando', 'llena', 'llena', 'llena', 'llenando'],
-                ingreso: "Cámara 11 (En proceso)", despacho: "Cámara 7 (FIFO Activo)", balance: "Cámara 6 liberada. Continuidad de despacho interplanta."
+                ingreso: "Cámara 11 (En proceso)", despacho: "Cámara 7 (FIFO Activo)", balance: "Cámara 6 liberada al pool de reserva. Continuidad del flujo de camiones."
             },
             {
                 dia: "Día 10",
                 estados: ['llenando', 'vacía', 'vaciando', 'llena', 'llena', 'llena'],
-                ingreso: "Cámara 6 (Re-ingreso)", despacho: "Cámara 8 (FIFO Activo)", balance: "Cámara 7 liberada. El flujo regresa al origen cerrando el anillo."
+                ingreso: "Cámara 6 (Re-ingreso)", despacho: "Cámara 8 (FIFO Activo)", balance: "Cámara 7 liberada. <strong>Estabilidad total del ciclo cerrado</strong> sin paradas de línea."
             }
         ];
 
