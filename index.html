@@ -3,124 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citrusvil | Simulador de Flujo Operativo Cámaras 6-11</title>
+    <title>Citrusvil | Dashboard de Capacidad Dinámica Cámaras 6-11</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* Ajustes específicos para la distribución circular tipo reloj */
+        /* Posicionamiento circular absoluto simulando las agujas del reloj */
         .clock-container {
             position: relative;
-            width: 340px;
-            height: 340px;
+            width: 360px;
+            height: 360px;
             border-radius: 50%;
         }
         .camara-node {
             position: absolute;
             transform: translate(-50%, -50%);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        /* Posiciones exactas en sentido horario (6 posiciones en el círculo) */
-        .pos-0 { top: 12%; left: 50%; }   /* Cámara 6 - Arriba (12 en el reloj) */
-        .pos-1 { top: 31%; left: 83%; }   /* Cámara 7 - (2 en el reloj) */
-        .pos-2 { top: 69%; left: 83%; }   /* Cámara 8 - (4 en el reloj) */
-        .pos-3 { top: 88%; left: 50%; }   /* Cámara 9 - Abajo (6 en el reloj) */
-        .pos-4 { top: 69%; left: 17%; }   /* Cámara 10 - (8 en el reloj) */
-        .pos-5 { top: 31%; left: 17%; }   /* Cámara 11 - (10 en el reloj) */
+        /* Distribución de las 6 cámaras en sentido horario */
+        .pos-0 { top: 12%; left: 50%; }   /* Cámara 6 - Arriba (12hs) */
+        .pos-1 { top: 31%; left: 83%; }   /* Cámara 7 - (2hs) */
+        .pos-2 { top: 69%; left: 83%; }   /* Cámara 8 - (4hs) */
+        .pos-3 { top: 88%; left: 50%; }   /* Cámara 9 - Abajo (6hs) */
+        .pos-4 { top: 69%; left: 17%; }   /* Cámara 10 - (8hs) */
+        .pos-5 { top: 31%; left: 17%; }   /* Cámara 11 - (10hs) */
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
+<body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased">
 
     <div class="max-w-6xl mx-auto p-4 md:p-8">
         
-        <header class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-800 pb-5 mb-8 gap-4">
+        <header class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-200 pb-6 mb-8 gap-4">
             <div>
                 <div class="flex items-center gap-2">
-                    <span class="bg-lime-500 text-slate-950 text-xs font-black px-2 py-0.5 rounded tracking-wider">CITRUSVIL</span>
-                    <span class="text-slate-500 text-xs font-bold tracking-widest">PRODUCTOS INDUSTRIALIZADOS</span>
+                    <span class="bg-emerald-700 text-white text-xs font-black px-2.5 py-0.5 rounded tracking-wider">CITRUSVIL</span>
+                    <span class="text-slate-400 text-xs font-semibold tracking-wider">PRODUCTOS INDUSTRIALIZADOS</span>
                 </div>
-                <h1 class="text-3xl font-extrabold text-white mt-1 tracking-tight">
-                    Simulador de Flujo Logístico <span class="text-lime-400">Cámaras 6 a 11</span>
+                <h1 class="text-3xl font-black text-slate-900 mt-1 tracking-tight">
+                    Simulador de Flujo Operativo <span class="text-emerald-700">Cámaras 6 a 11</span>
                 </h1>
-                <p class="text-slate-400 text-sm mt-0.5">Validación de capacidad dinámica, lógica FIFO y disparador automático de Interplanta.</p>
+                <p class="text-slate-500 text-sm mt-0.5">Análisis predictivo de ocupación y balance de masa según ritmo de producción.</p>
             </div>
             
-            <div class="flex gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800 backdrop-blur-sm">
-                <div class="text-center px-3 border-r border-slate-800">
-                    <span class="text-[10px] text-slate-500 block font-bold tracking-wider">OCUPACIÓN</span>
-                    <span id="kpi-ocupacion" class="text-xl font-black text-lime-400">0%</span>
+            <div class="flex gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div class="text-center px-4 border-r border-slate-100">
+                    <span class="text-[10px] text-slate-400 block font-bold tracking-widest uppercase">Ocupación Total</span>
+                    <span id="kpi-ocupacion" class="text-2xl font-black text-emerald-700">0%</span>
                 </div>
-                <div class="text-center px-3 border-r border-slate-800">
-                    <span class="text-[10px] text-slate-500 block font-bold tracking-wider">CÁMARAS LIBRES</span>
-                    <span id="kpi-libres" class="text-xl font-black text-slate-200">6</span>
+                <div class="text-center px-4 border-r border-slate-100">
+                    <span class="text-[10px] text-slate-400 block font-bold tracking-widest uppercase">Cámaras Libres</span>
+                    <span id="kpi-libres" class="text-2xl font-black text-slate-700">6</span>
                 </div>
                 <div class="text-center px-2">
-                    <span class="text-[10px] text-slate-500 block font-bold tracking-wider">INTERPLANTA</span>
-                    <span id="kpi-interplanta" class="text-xs font-bold bg-slate-800 px-2 py-0.5 rounded mt-1 block text-slate-400">PASIVO</span>
+                    <span class="text-[10px] text-slate-400 block font-bold tracking-widest uppercase">Estado Interplanta</span>
+                    <span id="kpi-interplanta" class="text-xs font-bold bg-slate-100 text-slate-500 px-3 py-1 rounded-md mt-1.5 block tracking-wide">STANDBY</span>
                 </div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             <div class="lg:col-span-7 space-y-6">
-                
-                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-lime-500 animate-ping"></span>
-                            Consola de Control de Simulación
+                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-5">
+                        <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse"></span>
+                            Línea de Tiempo de Simulación
                         </h2>
-                        <span id="contador-pasos" class="text-xs font-mono bg-slate-800 text-slate-400 px-2 py-1 rounded">Paso: 0 / 10</span>
+                        <span id="contador-dias" class="text-xs font-bold bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full border border-emerald-100">Estado Inicial</span>
                     </div>
 
-                    <div class="flex flex-wrap gap-3 mb-5">
-                        <button id="btn-siguiente" onclick="avanzarPaso()" class="flex-1 bg-lime-500 hover:bg-lime-400 text-slate-950 font-bold py-3 px-5 rounded-xl transition duration-200 shadow-lg shadow-lime-500/10 flex items-center justify-center gap-2 cursor-pointer">
-                            Avanzar Flujo Horario <span class="text-lg">▶</span>
+                    <div class="flex flex-wrap gap-3 mb-6">
+                        <button id="btn-siguiente" onclick="avanzarDia()" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3.5 px-6 rounded-xl transition duration-150 shadow-md shadow-emerald-700/10 flex items-center justify-center gap-2 cursor-pointer text-sm tracking-wide">
+                            Avanzar Cronograma Operativo <span class="text-base">▶</span>
                         </button>
-                        <button onclick="reiniciarSimulacion()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 px-5 rounded-xl transition cursor-pointer">
-                            Reiniciar Ciclo
+                        <button onclick="reiniciarSimulacion()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 px-5 rounded-xl transition cursor-pointer text-sm">
+                            Reiniciar
                         </button>
                     </div>
 
-                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800">
-                        <div class="text-xs font-bold text-lime-400 uppercase tracking-widest mb-1">Análisis de Operación Actual</div>
-                        <p id="descripcion-estado" class="text-slate-300 text-sm leading-relaxed">
-                            Presioná el botón verde para iniciar la simulación secuencial de llenado en sentido horario desde la cabecera (Cámara 6).
+                    <div class="p-5 bg-slate-50 rounded-xl border border-slate-200/60 relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-700"></div>
+                        <div class="text-[10px] font-bold text-emerald-800 uppercase tracking-widest mb-1.5">Monitoreo Técnico de la Jornada</div>
+                        <p id="descripcion-estado" class="text-slate-600 text-sm leading-relaxed font-medium">
+                            Presioná el botón superior para dar inicio al flujo. El simulador representará la progresión en días, mostrando cómo el stock avanza en sentido horario manteniendo la sincronización con los despachos.
                         </p>
                     </div>
                 </div>
-
-                <div class="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-5 text-sm">
-                    <h3 class="font-bold text-slate-300 mb-3 tracking-wide uppercase text-xs">Políticas de Restricción del Stock de Pulmón</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate-400">
-                        <div class="flex items-start gap-2.5">
-                            <div class="w-5 h-5 rounded bg-slate-800 flex items-center justify-center text-lime-400 shrink-0 font-bold">1</div>
-                            <p><strong class="text-slate-300">Secuencia Horaria:</strong> El flujo físico obliga al llenado correlativo continuo de las cámaras (6 → 7 → 8 → 9 → 10 → 11).</p>
-                        </div>
-                        <div class="flex items-start gap-2.5">
-                            <div class="w-5 h-5 rounded bg-slate-800 flex items-center justify-center text-lime-400 shrink-0 font-bold">2</div>
-                            <p><strong class="text-slate-300">Gatillo de Seguridad:</strong> Al llenarse la Cámara 9, se alcanza el umbral mínimo crítico de colchón de seguridad (<span class="text-amber-400 font-semibold">≥ 2 cámaras vacías</span>).</p>
-                        </div>
-                        <div class="flex items-start gap-2.5">
-                            <div class="w-5 h-5 rounded bg-slate-800 flex items-center justify-center text-lime-400 shrink-0 font-bold">3</div>
-                            <p><strong class="text-slate-300">Lógica FIFO Activa:</strong> La orden de Interplanta inicia inmediatamente la evacuación priorizando el pallet más antiguo (Cámara 6).</p>
-                        </div>
-                        <div class="flex items-start gap-2.5">
-                            <div class="w-5 h-5 rounded bg-slate-800 flex items-center justify-center text-lime-400 shrink-0 font-bold">4</div>
-                            <p><strong class="text-slate-300">Sincronización Total:</strong> El sistema equilibra el ritmo de producción entrante con los despachos de camiones interplanta.</p>
-                        </div>
-                    </div>
+                
+                <div class="px-2 text-xs text-slate-400 italic">
+                    * Nota técnica: El modelo asume un ritmo de producción constante donde la tasa de llenado de una cámara nueva se completa cada 48 horas corporativas.
                 </div>
             </div>
 
-            <div class="lg:col-span-5 flex flex-col items-center bg-slate-900/40 border border-slate-800/60 p-6 rounded-2xl shadow-inner">
-                <h3 class="text-sm font-bold text-slate-400 mb-6 tracking-widest uppercase">Distribución Espacial en Planta</h3>
+            <div class="lg:col-span-5 flex flex-col items-center bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
+                <h3 class="text-xs font-bold text-slate-400 mb-6 tracking-widest uppercase">Layout de Cámaras (Flujo Horario)</h3>
                 
-                <div class="clock-container my-4 bg-slate-950/80 rounded-full border border-slate-800/40 flex items-center justify-center shadow-2xl shadow-black">
+                <div class="clock-container my-2 bg-slate-50 border border-slate-200/80 flex items-center justify-center shadow-inner">
                     
-                    <div class="w-32 h-32 rounded-full bg-slate-900 border-2 border-slate-800 flex flex-col items-center justify-center text-center p-2 z-10 shadow-lg">
-                        <span class="text-[10px] text-slate-500 font-bold tracking-widest">FLUJO</span>
-                        <span class="text-xs font-black text-lime-500 tracking-wider">HORARIO</span>
-                        <svg class="w-6 h-6 text-lime-500/70 mt-1 animate-spin" style="animation-duration: 20s" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="w-32 h-32 rounded-full bg-white border border-slate-200 flex flex-col items-center justify-center text-center p-2 z-10 shadow-sm">
+                        <span class="text-[9px] text-slate-400 font-bold tracking-widest">SENTIDO</span>
+                        <span class="text-xs font-black text-emerald-800 tracking-wider">HORARIO</span>
+                        <svg class="w-5 h-5 text-emerald-600/80 mt-1.5 animate-spin" style="animation-duration: 25s" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
                         </svg>
                     </div>
@@ -128,22 +110,22 @@
                     <div id="reloj-camaras" class="absolute inset-0 w-full h-full"></div>
                 </div>
 
-                <div class="w-full grid grid-cols-2 gap-2 mt-6 pt-4 border-t border-slate-800 text-xs">
-                    <div class="flex items-center gap-2.5 bg-slate-950 p-2 rounded-lg border border-slate-800/60">
-                        <div class="w-3.5 h-3.5 bg-slate-800 border border-slate-700 rounded shadow-sm"></div>
-                        <span class="text-slate-400">Vacía / Disponible</span>
+                <div class="w-full grid grid-cols-2 gap-2 mt-6 pt-4 border-t border-slate-100 text-[11px] font-medium text-slate-500">
+                    <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/40">
+                        <div class="w-3 h-3 bg-white border border-slate-300 rounded shadow-sm"></div>
+                        <span>Disponible</span>
                     </div>
-                    <div class="flex items-center gap-2.5 bg-slate-950 p-2 rounded-lg border border-slate-800/60">
-                        <div class="w-3.5 h-3.5 bg-cyan-500 animate-pulse rounded shadow-sm shadow-cyan-500/20"></div>
-                        <span class="text-slate-400">Recibiendo Prod.</span>
+                    <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/40">
+                        <div class="w-3 h-3 bg-sky-500 animate-pulse rounded shadow-sm"></div>
+                        <span>Llenando (Prod.)</span>
                     </div>
-                    <div class="flex items-center gap-2.5 bg-slate-950 p-2 rounded-lg border border-slate-800/60">
-                        <div class="w-3.5 h-3.5 bg-emerald-600 rounded shadow-sm"></div>
-                        <span class="text-slate-400">Llena / Retención</span>
+                    <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/40">
+                        <div class="w-3 h-3 bg-emerald-700 rounded shadow-sm"></div>
+                        <span>Capacidad Completa</span>
                     </div>
-                    <div class="flex items-center gap-2.5 bg-slate-950 p-2 rounded-lg border border-slate-800/60">
-                        <div class="w-3.5 h-3.5 bg-amber-500 animate-pulse rounded shadow-sm shadow-amber-500/20"></div>
-                        <span class="text-slate-400">Evacuación (Interplanta)</span>
+                    <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/40">
+                        <div class="w-3 h-3 bg-amber-500 animate-pulse rounded shadow-sm"></div>
+                        <span>Vaciando (Interplanta)</span>
                     </div>
                 </div>
             </div>
@@ -152,153 +134,156 @@
 
     <script>
         const camarasConfig = [6, 7, 8, 9, 10, 11];
-        let pasoActual = 0;
+        let diaActual = 0;
 
-        // Base de conocimiento ampliada para la simulación de gerencia (Flujo en formato reloj)
-        const pasosSimulacion = [
+        // Estructura de datos basada en días, respetando el llenado y vaciado paralelo cada 2 días
+        const cronogramaDias = [
             {
+                dia: "Estado Inicial",
                 estados: ['vacía', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
-                desc: "🟢 **Línea lista:** El circuito de Cámaras 6 a 11 se encuentra vacío. Todo el pulmón operativo está disponible para recibir stock de producto terminado."
+                desc: "Planta lista para recibir stock. Todas las cámaras del pulmón (6 a 11) se encuentran disponibles en el sistema."
             },
             {
-                estados: ['config-llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
-                desc: "📥 **Paso 1:** Se da inicio formal a la recepción. La producción entrante comienza a estibarse en la **Cámara 6**, que actúa como la cabecera del anillo."
+                dia: "Día 1",
+                estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
+                desc: "Inicia la ventana operativa. La producción ingresa a la **Cámara 6**. Al término de este día se encuentra al 50% de su capacidad."
             },
             {
-                estados: ['llena', 'config-llenando', 'vacía', 'vacía', 'vacía', 'vacía'],
-                desc: "🔄 **Paso 2:** La Cámara 6 completó su capacidad máxima. Por secuencia física lógica, el flujo se desplaza en sentido horario directo hacia la **Cámara 7**."
+                dia: "Día 2",
+                estados: ['llena', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
+                desc: "Se cumplen las primeras 48 horas. **Cámara 6 completada al 100%**. El flujo se prepara para transferirse a la siguiente posición según las agujas del reloj."
             },
             {
-                estados: ['llena', 'llena', 'config-llenando', 'vacía', 'vacía', 'vacía'],
-                desc: "🔄 **Paso 3:** Se satura la Cámara 7. El ingreso se transfiere sin interrupciones a la **Cámara 8**. Las variables de stock acumulado en el ala este del layout comienzan a incrementarse."
+                dia: "Día 3",
+                estados: ['llena', 'llenando', 'vacía', 'vacía', 'vacía', 'vacía'],
+                desc: "La producción avanza en sentido horario e inicia el llenado de la **Cámara 7**, manteniendo la Cámara 6 en stock retenido."
             },
             {
-                estados: ['llena', 'llena', 'llena', 'config-llenando', 'vacía', 'vacía'],
-                desc: "⚠️ **Paso 4 (Umbral de Alerta):** Se inicia el llenado de la **Cámara 9**. El espacio libre remanente se reduce. El sistema detecta que se acerca el límite del colchón de seguridad obligatorio."
+                dia: "Día 4",
+                estados: ['llena', 'llena', 'vacía', 'vacía', 'vacía', 'vacía'],
+                desc: "Fin de la segunda ventana de 48 horas. **Cámara 7 completada**. El pulmón acumula stock de producto terminado de forma segura."
             },
             {
-                estados: ['llena', 'llena', 'llena', 'llena', 'vacía', 'vacía'],
-                desc: "🚨 **Paso 5 (Hito Crítico - Alerta):** Se completó la Cámara 9. Quedan estrictamente **2 cámaras vacías (10 y 11)**. Esta condición técnica dispara de forma automática la **Alerta de Interplanta** para evitar bloqueos."
+                dia: "Día 5",
+                estados: ['llena', 'llena', 'llenando', 'vacía', 'vacía', 'vacía'],
+                desc: "El flujo de ingresos se traslada a la **Cámara 8**. Las métricas de ocupación general de la planta empiezan a subir de forma controlada."
             },
             {
-                estados: ['vaciando', 'llena', 'llena', 'llena', 'config-llenando', 'vacía'],
-                desc: "⚡ **Paso 6 (Gatillo Operativo):** ¡Acción de choque! Se inicia el transporte por camiones interplanta aplicando **FIFO estricto** desde la **Cámara 6** (la más antigua). En paralelo, la producción sigue llenando la **Cámara 10**."
+                dia: "Día 6",
+                estados: ['llena', 'llena', 'llena', 'vacía', 'vacía', 'vacía'],
+                desc: "Se completaron 6 días de ritmo continuo. **Cámara 8 completada**. Quedan 3 cámaras disponibles. Se planifica la activación de la logística de evacuación."
             },
             {
-                estados: ['vacía', 'vaciando', 'llena', 'llena', 'llena', 'config-llenando'],
-                desc: "🔄 **Paso 7 (Desbloqueo de Pulmón):** La Cámara 6 ha quedado totalmente evacuada y libre, regresando al pool de reserva. La logística interplanta se mueve ahora a vaciar la **Cámara 7**, mientras producción utiliza la **Cámara 11**."
+                dia: "Día 7",
+                estados: ['llena', 'llena', 'llena', 'llenando', 'vacía', 'vacía'],
+                desc: "Inicia el llenado de la **Cámara 9**. El inventario disponible llega al límite técnico de seguridad antes del disparo de alertas."
             },
             {
-                estados: ['config-llenando', 'vacía', 'vaciando', 'llena', 'llena', 'llena'],
-                desc: "🔄 **Paso 8 (Ciclo Continuo Cerrado):** Se liberó la Cámara 7. Al estar la cabecera disponible, el flujo de producción vuelve a ingresar a la **Cámara 6** en sentido horario, manteniendo el movimiento continuo de stock."
+                dia: "Día 8 (Gatillo Sincronizado)",
+                estados: ['vaciando', 'llena', 'llena', 'llena', 'llenando', 'vacía'],
+                desc: "💥 **Punto de Equilibrio:** Al completarse la Cámara 9, se activa la orden de **Interplanta** para liberar espacio. Siguiendo el ritmo exacto de producción, la **Cámara 6 se empieza a vaciar** mediante camiones mientras, en paralelo, la producción comienza a ocupar la **Cámara 10**."
             },
             {
-                estados: ['llena', 'config-llenando', 'vacía', 'vaciando', 'llena', 'llena'],
-                desc: "🔄 **Paso 9 (Evolución Dinámica):** El ciclo se consolida. Se evacúa la Cámara 8 hacia interplanta y la producción vuelve a completar la Cámara 6 para saltar nuevamente a la 7."
+                dia: "Día 9",
+                estados: ['vacía', 'vaciando', 'llena', 'llena', 'llena', 'llenando'],
+                desc: "La Cámara 6 quedó 100% liberada y disponible. Manteniendo el balance, la logística pasa a **vaciar la Cámara 7** en un ciclo de 2 días, mientras la línea de producción llena la **Cámara 11**."
             },
             {
-                estados: ['llena', 'llena', 'config-llenando', 'vacía', 'vaciando', 'llena'],
-                desc: "🔄 **Paso 10 (Estabilidad Operativa):** Demostración del balance de masa. El pulmón se auto-regula manteniendo siempre stock amortiguador disponible y garantizando cero paradas en la línea de producción industrial."
+                dia: "Día 10 (Ciclo Continuo)",
+                estados: ['llenando', 'vacía', 'vaciando', 'llena', 'llena', 'llena'],
+                desc: "🔄 **Estabilidad Operativa:** La Cámara 7 se liberó por completo. Al estar la cabecera del reloj (Cámara 6) limpia, el flujo de producción vuelve a ingresar a ella. Se demuestra un ciclo constante, infinito y perfectamente equilibrado con los despachos."
             }
         ];
 
-        function renderizarEstructuraReloj() {
+        function renderizarReloj() {
             const contenedor = document.getElementById('reloj-camaras');
             contenedor.innerHTML = '';
 
-            // Obtener el estado actual según el array de pasos
-            const estadosActuales = pasosSimulacion[pasoActual].estados;
+            const datosActuales = cronogramaDias[diaActual];
+            const estados = datosActuales.estados;
 
             camarasConfig.forEach((num, index) => {
-                const estado = estadosActuales[index];
+                const estado = estados[index];
                 
-                let cardEstilos = 'bg-slate-900 border-slate-800 text-slate-400';
-                let badgeEstilos = 'bg-slate-800 text-slate-400';
-                let textoEstado = 'VACÍA';
-                let glowEfecto = '';
+                let cardEstilos = 'bg-white border-slate-200 text-slate-400';
+                let badgeEstilos = 'bg-slate-100 text-slate-400';
+                let textoEstado = 'DISPONIBLE';
+                let shadowGlow = 'shadow-sm';
 
-                if (estado === 'config-llenando') {
-                    cardEstilos = 'bg-cyan-950/90 border-cyan-500 text-cyan-200 ring-2 ring-cyan-400/30';
-                    badgeEstilos = 'bg-cyan-500 text-slate-950 font-bold animate-pulse';
-                    textoEstado = 'RECIBIENDO';
-                    glowEfecto = 'shadow-lg shadow-cyan-500/10';
+                if (estado === 'llenando') {
+                    cardEstilos = 'bg-sky-50/60 border-sky-400 text-sky-900 ring-1 ring-sky-300/30';
+                    badgeEstilos = 'bg-sky-500 text-white font-bold animate-pulse';
+                    textoEstado = 'LLENANDO';
+                    shadowGlow = 'shadow-md shadow-sky-500/5';
                 } else if (estado === 'llena') {
-                    cardEstilos = 'bg-emerald-950/80 border-emerald-700 text-emerald-200';
-                    badgeEstilos = 'bg-emerald-600 text-white font-medium';
-                    textoEstado = 'LLENA';
+                    cardEstilos = 'bg-emerald-50/40 border-emerald-600 text-emerald-950 font-medium';
+                    badgeEstilos = 'bg-emerald-700 text-white font-semibold';
+                    textoEstado = 'COMPLETA';
                 } else if (estado === 'vaciando') {
-                    cardEstilos = 'bg-amber-950/90 border-amber-500 text-amber-200 ring-2 ring-amber-400/30';
+                    cardEstilos = 'bg-amber-50/60 border-amber-400 text-amber-900 ring-1 ring-amber-300/30';
                     badgeEstilos = 'bg-amber-500 text-slate-950 font-black animate-pulse';
                     textoEstado = 'DESPACHO';
-                    glowEfecto = 'shadow-lg shadow-amber-500/10';
+                    shadowGlow = 'shadow-md shadow-amber-500/5';
                 }
 
-                // Armado del nodo con clases pos-0 a pos-5 para respetar el sentido horario de las agujas
                 contenedor.innerHTML += `
-                    <div class="camara-node pos-${index} ${glowEfecto} w-[92px] h-[92px] border rounded-2xl flex flex-col items-center justify-center p-2 text-center select-none ${cardEstilos}">
-                        <span class="text-[9px] uppercase tracking-widest opacity-60 font-bold">Cam</span>
+                    <div class="camara-node pos-${index} ${shadowGlow} w-[94px] h-[94px] border rounded-2xl flex flex-col items-center justify-center p-2 text-center select-none ${cardEstilos}">
+                        <span class="text-[9px] uppercase tracking-widest opacity-50 font-bold">Cámara</span>
                         <span class="text-2xl font-black tracking-tight my-0.5">${num}</span>
-                        <span class="text-[8px] px-1.5 py-0.5 rounded-md tracking-wide font-extrabold ${badgeEstilos}">${textoEstado}</span>
+                        <span class="text-[8px] px-2 py-0.5 rounded font-extrabold tracking-wide ${badgeEstilos}">${textoEstado}</span>
                     </div>
                 `;
             });
 
-            actualizarKPIs(estadosActuales);
+            actualizarMetricas(estados);
         }
 
-        function actualizarKPIs(estados) {
-            // Contadores para métricas
+        function actualizarMetricas(estados) {
             const llenas = estados.filter(e => e === 'llena').length;
-            const enProceso = estados.filter(e => e === 'config-llenando' || e === 'vaciando').length;
+            const enProceso = estados.filter(e => e === 'llenando' || e === 'vaciando').length;
             const vacias = estados.filter(e => e === 'vacía').length;
 
-            // Porcentaje representativo para gerencia
-            const porcentajeOcupacion = Math.round(((llenas + (enProceso * 0.5)) / 6) * 100);
+            // Cálculo matemático de ocupación para reporte de gerencia
+            const porcentaje = Math.round(((llenas + (enProceso * 0.5)) / 6) * 100);
             
-            document.getElementById('kpi-ocupacion').innerText = `${porcentajeOcupacion}%`;
+            document.getElementById('kpi-ocupacion').innerText = `${porcentaje}%`;
             document.getElementById('kpi-libres').innerText = vacias;
 
-            // Control de texto del gatillo de interplanta
             const kpiInterplanta = document.getElementById('kpi-interplanta');
             if (estados.includes('vaciando')) {
                 kpiInterplanta.innerText = "ACTIVO (FIFO)";
-                kpiInterplanta.className = "text-xs font-black bg-amber-500 text-slate-950 px-2 py-0.5 rounded mt-1 block animate-pulse";
-            } else if (pasoActual === 5) {
-                kpiInterplanta.innerText = "ALERTA CRÍTICA";
-                kpiInterplanta.className = "text-xs font-black bg-red-600 text-white px-2 py-0.5 rounded mt-1 block animate-bounce";
+                kpiInterplanta.className = "text-xs font-black bg-amber-500 text-slate-950 px-2.5 py-1 rounded-md mt-1.5 block animate-pulse tracking-wide";
             } else {
-                kpiInterplanta.innerText = "PASIVO";
-                kpiInterplanta.className = "text-xs font-bold bg-slate-800 text-slate-400 px-2 py-0.5 rounded mt-1 block";
+                kpiInterplanta.innerText = "STANDBY";
+                kpiInterplanta.className = "text-xs font-bold bg-slate-100 text-slate-400 px-2.5 py-1 rounded-md mt-1.5 block tracking-wide";
             }
 
-            // Actualizar etiqueta del contador de pasos de la presentación
-            document.getElementById('contador-pasos').innerText = `Paso: ${pasoActual} / 10`;
+            document.getElementById('contador-dias').innerText = cronogramaDias[diaActual].dia;
         }
 
-        function avanzarPaso() {
-            if (pasoActual < pasosSimulacion.length - 1) {
-                pasoActual++;
+        function avanzarDia() {
+            if (diaActual < cronogramaDias.length - 1) {
+                diaActual++;
             } else {
-                pasoActual = 0; // Reinicio automático al terminar el ciclo para la demo interactiva
+                diaActual = 1; // Hace loop al Día 1 para mantener la fluidez en la presentación
             }
             
-            // Reemplazo de marcadores Markdown sencillos para renderizar negritas en el cuadro de texto
-            let descFormateada = pasosSimulacion[pasoActual].desc
-                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
-                .replace(/--(.*?)--/g, '<span class="text-amber-400 font-bold">$1</span>');
+            // Reemplazo de marcas de texto para renderizar negritas en la interfaz corporativa
+            let textoFormateado = cronogramaDias[diaActual].desc
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-900 font-bold">$1</strong>');
 
-            document.getElementById('descripcion-estado').innerHTML = descFormateada;
-            renderizarEstructuraReloj();
+            document.getElementById('descripcion-estado').innerHTML = textoFormateado;
+            renderizarReloj();
         }
 
         function reiniciarSimulacion() {
-            pasoActual = 0;
-            document.getElementById('descripcion-estado').innerHTML = "Presioná el botón verde para iniciar la simulación secuencial de llenado en sentido horario desde la cabecera (Cámara 6).";
-            renderizarEstructuraReloj();
+            diaActual = 0;
+            document.getElementById('descripcion-estado').innerHTML = "Presioná el botón superior para dar inicio al flujo. El simulador representará la progresión en días, mostrando cómo el stock avanza en sentido horario manteniendo la sincronización con los despachos.";
+            renderizarReloj();
         }
 
-        // Ejecución del renderizado inicial en la carga de la suite
-        renderizarEstructuraReloj();
+        // Carga inicial del Layout corporativo
+        renderizarReloj();
     </script>
 </body>
 </html>
