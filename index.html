@@ -3,160 +3,302 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Cámaras 6-11 | Flujo Logístico</title>
-    <!-- Tailwind CSS para diseño rápido -->
+    <title>Citrusvil | Simulador de Flujo Operativo Cámaras 6-11</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        /* Ajustes específicos para la distribución circular tipo reloj */
+        .clock-container {
+            position: relative;
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+        }
+        .camara-node {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        /* Posiciones exactas en sentido horario (6 posiciones en el círculo) */
+        .pos-0 { top: 12%; left: 50%; }   /* Cámara 6 - Arriba (12 en el reloj) */
+        .pos-1 { top: 31%; left: 83%; }   /* Cámara 7 - (2 en el reloj) */
+        .pos-2 { top: 69%; left: 83%; }   /* Cámara 8 - (4 en el reloj) */
+        .pos-3 { top: 88%; left: 50%; }   /* Cámara 9 - Abajo (6 en el reloj) */
+        .pos-4 { top: 69%; left: 17%; }   /* Cámara 10 - (8 en el reloj) */
+        .pos-5 { top: 31%; left: 17%; }   /* Cámara 11 - (10 en el reloj) */
+    </style>
 </head>
-<body class="bg-gray-900 text-gray-100 min-h-screen p-6 font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
 
-    <div class="max-w-5xl mx-auto">
-        <!-- Encabezado -->
-        <header class="border-b border-gray-700 pb-4 mb-6">
-            <h1 class="text-3xl font-bold text-yellow-400">Simulador Operativo: Cámaras 6 a 11</h1>
-            <p class="text-gray-400 mt-1">Lógica de llenado, vaciado automático (Interplanta) y stock de pulmón obligatorio.</p>
+    <div class="max-w-6xl mx-auto p-4 md:p-8">
+        
+        <header class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-800 pb-5 mb-8 gap-4">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="bg-lime-500 text-slate-950 text-xs font-black px-2 py-0.5 rounded tracking-wider">CITRUSVIL</span>
+                    <span class="text-slate-500 text-xs font-bold tracking-widest">PRODUCTOS INDUSTRIALIZADOS</span>
+                </div>
+                <h1 class="text-3xl font-extrabold text-white mt-1 tracking-tight">
+                    Simulador de Flujo Logístico <span class="text-lime-400">Cámaras 6 a 11</span>
+                </h1>
+                <p class="text-slate-400 text-sm mt-0.5">Validación de capacidad dinámica, lógica FIFO y disparador automático de Interplanta.</p>
+            </div>
+            
+            <div class="flex gap-3 bg-slate-900/60 p-3 rounded-xl border border-slate-800 backdrop-blur-sm">
+                <div class="text-center px-3 border-r border-slate-800">
+                    <span class="text-[10px] text-slate-500 block font-bold tracking-wider">OCUPACIÓN</span>
+                    <span id="kpi-ocupacion" class="text-xl font-black text-lime-400">0%</span>
+                </div>
+                <div class="text-center px-3 border-r border-slate-800">
+                    <span class="text-[10px] text-slate-500 block font-bold tracking-wider">CÁMARAS LIBRES</span>
+                    <span id="kpi-libres" class="text-xl font-black text-slate-200">6</span>
+                </div>
+                <div class="text-center px-2">
+                    <span class="text-[10px] text-slate-500 block font-bold tracking-wider">INTERPLANTA</span>
+                    <span id="kpi-interplanta" class="text-xs font-bold bg-slate-800 px-2 py-0.5 rounded mt-1 block text-slate-400">PASIVO</span>
+                </div>
+            </div>
         </header>
 
-        <!-- Panel de Control y Reglas -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 col-span-2">
-                <h2 class="text-xl font-semibold mb-3 text-blue-400">Controles de Simulación</h2>
-                <div class="flex flex-wrap gap-3">
-                    <button id="btn-siguiente" onclick="avanzarPaso()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition shadow-md">
-                        Avanzar Siguiente Paso ▶
-                    </button>
-                    <button onclick="reiniciarSimulacion()" class="bg-gray-700 hover:bg-gray-600 text-gray-200 font-semibold py-2 px-4 rounded transition">
-                        Reiniciar
-                    </button>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <div class="lg:col-span-7 space-y-6">
+                
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-bold text-slate-200 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-lime-500 animate-ping"></span>
+                            Consola de Control de Simulación
+                        </h2>
+                        <span id="contador-pasos" class="text-xs font-mono bg-slate-800 text-slate-400 px-2 py-1 rounded">Paso: 0 / 10</span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3 mb-5">
+                        <button id="btn-siguiente" onclick="avanzarPaso()" class="flex-1 bg-lime-500 hover:bg-lime-400 text-slate-950 font-bold py-3 px-5 rounded-xl transition duration-200 shadow-lg shadow-lime-500/10 flex items-center justify-center gap-2 cursor-pointer">
+                            Avanzar Flujo Horario <span class="text-lg">▶</span>
+                        </button>
+                        <button onclick="reiniciarSimulacion()" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-3 px-5 rounded-xl transition cursor-pointer">
+                            Reiniciar Ciclo
+                        </button>
+                    </div>
+
+                    <div class="p-4 bg-slate-950 rounded-xl border border-slate-800">
+                        <div class="text-xs font-bold text-lime-400 uppercase tracking-widest mb-1">Análisis de Operación Actual</div>
+                        <p id="descripcion-estado" class="text-slate-300 text-sm leading-relaxed">
+                            Presioná el botón verde para iniciar la simulación secuencial de llenado en sentido horario desde la cabecera (Cámara 6).
+                        </p>
+                    </div>
                 </div>
-                <div class="mt-4 p-3 bg-gray-900 rounded border border-gray-700">
-                    <span class="font-bold text-yellow-400">Estado Actual:</span>
-                    <p id="descripcion-estado" class="text-sm mt-1 text-gray-300">Presioná "Avanzar" para iniciar la recepción en la Cámara 6.</p>
+
+                <div class="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-5 text-sm">
+                    <h3 class="font-bold text-slate-300 mb-3 tracking-wide uppercase text-xs">Políticas de Restricción del Stock de Pulmón</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-slate-400">
+                        <div class="flex items-start gap-2.5">
+                            <div class="w-5 h-5 rounded bg-slate-800 flex items-center justify-center text-lime-400 shrink-0 font-bold">1</div>
+                            <p><strong class="text-slate-300">Secuencia Horaria:</strong> El flujo físico obliga al llenado correlativo continuo de las cámaras (6 → 7 → 8 → 9 → 10 → 11).</p>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <div class="w-5 h-5 rounded bg-slate-800 flex items-center justify-center text-lime-400 shrink-0 font-bold">2</div>
+                            <p><strong class="text-slate-300">Gatillo de Seguridad:</strong> Al llenarse la Cámara 9, se alcanza el umbral mínimo crítico de colchón de seguridad (<span class="text-amber-400 font-semibold">≥ 2 cámaras vacías</span>).</p>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <div class="w-5 h-5 rounded bg-slate-800 flex items-center justify-center text-lime-400 shrink-0 font-bold">3</div>
+                            <p><strong class="text-slate-300">Lógica FIFO Activa:</strong> La orden de Interplanta inicia inmediatamente la evacuación priorizando el pallet más antiguo (Cámara 6).</p>
+                        </div>
+                        <div class="flex items-start gap-2.5">
+                            <div class="w-5 h-5 rounded bg-slate-800 flex items-center justify-center text-lime-400 shrink-0 font-bold">4</div>
+                            <p><strong class="text-slate-300">Sincronización Total:</strong> El sistema equilibra el ritmo de producción entrante con los despachos de camiones interplanta.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 text-sm">
-                <h2 class="text-base font-semibold mb-2 text-yellow-500">Reglas del Sistema</h2>
-                <ul class="list-disc list-inside space-y-1 text-gray-400">
-                    <li>Secuencia obligatoria de 6 a 11.</li>
-                    <li>Límite de alerta al llenar Cam 9.</li>
-                    <li>Debe haber <span class="text-red-400 font-bold">≥ 2 cámaras vacías</span>.</li>
-                    <li>Vaciado FIFO (Interplanta) desde Cam 6.</li>
-                </ul>
+            <div class="lg:col-span-5 flex flex-col items-center bg-slate-900/40 border border-slate-800/60 p-6 rounded-2xl shadow-inner">
+                <h3 class="text-sm font-bold text-slate-400 mb-6 tracking-widest uppercase">Distribución Espacial en Planta</h3>
+                
+                <div class="clock-container my-4 bg-slate-950/80 rounded-full border border-slate-800/40 flex items-center justify-center shadow-2xl shadow-black">
+                    
+                    <div class="w-32 h-32 rounded-full bg-slate-900 border-2 border-slate-800 flex flex-col items-center justify-center text-center p-2 z-10 shadow-lg">
+                        <span class="text-[10px] text-slate-500 font-bold tracking-widest">FLUJO</span>
+                        <span class="text-xs font-black text-lime-500 tracking-wider">HORARIO</span>
+                        <svg class="w-6 h-6 text-lime-500/70 mt-1 animate-spin" style="animation-duration: 20s" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
+                        </svg>
+                    </div>
+
+                    <div id="reloj-camaras" class="absolute inset-0 w-full h-full"></div>
+                </div>
+
+                <div class="w-full grid grid-cols-2 gap-2 mt-6 pt-4 border-t border-slate-800 text-xs">
+                    <div class="flex items-center gap-2.5 bg-slate-950 p-2 rounded-lg border border-slate-800/60">
+                        <div class="w-3.5 h-3.5 bg-slate-800 border border-slate-700 rounded shadow-sm"></div>
+                        <span class="text-slate-400">Vacía / Disponible</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 bg-slate-950 p-2 rounded-lg border border-slate-800/60">
+                        <div class="w-3.5 h-3.5 bg-cyan-500 animate-pulse rounded shadow-sm shadow-cyan-500/20"></div>
+                        <span class="text-slate-400">Recibiendo Prod.</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 bg-slate-950 p-2 rounded-lg border border-slate-800/60">
+                        <div class="w-3.5 h-3.5 bg-emerald-600 rounded shadow-sm"></div>
+                        <span class="text-slate-400">Llena / Retención</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 bg-slate-950 p-2 rounded-lg border border-slate-800/60">
+                        <div class="w-3.5 h-3.5 bg-amber-500 animate-pulse rounded shadow-sm shadow-amber-500/20"></div>
+                        <span class="text-slate-400">Evacuación (Interplanta)</span>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <!-- Visualización de Cámaras -->
-        <h2 class="text-xl font-semibold mb-4 text-gray-300">Mapa de Cámaras en Tiempo Real</h2>
-        <div id="contenedor-camaras" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-8">
-            <!-- Las cámaras se generan dinámicamente con JS -->
-        </div>
-
-        <!-- Referencias de Color -->
-        <div class="flex gap-6 justify-center text-sm bg-gray-800 p-3 rounded-lg border border-gray-700">
-            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-gray-700 rounded"></div> Vacía</div>
-            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-blue-500 rounded animate-pulse"></div> Llenando</div>
-            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-red-600 rounded"></div> Llena</div>
-            <div class="flex items-center gap-2"><div class="w-4 h-4 bg-yellow-500 rounded animate-pulse"></div> Vaciando (Interplanta)</div>
         </div>
     </div>
 
-    <!-- Lógica de la Simulación -->
     <script>
         const camarasConfig = [6, 7, 8, 9, 10, 11];
-        // Estados posibles: 'vacía', 'llenando', 'llena', 'vaciando'
-        let estadosCamaras = Array(6).fill('vacía');
         let pasoActual = 0;
 
+        // Base de conocimiento ampliada para la simulación de gerencia (Flujo en formato reloj)
         const pasosSimulacion = [
             {
-                estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
-                desc: "Fase 0: Se inicia la recepción de producto terminado en la Cámara 6."
+                estados: ['vacía', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
+                desc: "🟢 **Línea lista:** El circuito de Cámaras 6 a 11 se encuentra vacío. Todo el pulmón operativo está disponible para recibir stock de producto terminado."
             },
             {
-                estados: ['llena', 'llenando', 'vacía', 'vacía', 'vacía', 'vacía'],
-                desc: "Fase 1: Cámara 6 completada. El flujo pasa automáticamente a la Cámara 7."
+                estados: ['config-llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
+                desc: "📥 **Paso 1:** Se da inicio formal a la recepción. La producción entrante comienza a estibarse en la **Cámara 6**, que actúa como la cabecera del anillo."
             },
             {
-                estados: ['llena', 'llena', 'llenando', 'vacía', 'vacía', 'vacía'],
-                desc: "Fase 2: Cámara 7 completada. Se inicia el llenado de la Cámara 8."
+                estados: ['llena', 'config-llenando', 'vacía', 'vacía', 'vacía', 'vacía'],
+                desc: "🔄 **Paso 2:** La Cámara 6 completó su capacidad máxima. Por secuencia física lógica, el flujo se desplaza en sentido horario directo hacia la **Cámara 7**."
             },
             {
-                estados: ['llena', 'llena', 'llena', 'llenando', 'vacía', 'vacía'],
-                desc: "Fase 3: Cámara 8 llena. Se empieza a ocupar la Cámara 9. ¡Atención al límite!"
+                estados: ['llena', 'llena', 'config-llenando', 'vacía', 'vacía', 'vacía'],
+                desc: "🔄 **Paso 3:** Se satura la Cámara 7. El ingreso se transfiere sin interrupciones a la **Cámara 8**. Las variables de stock acumulado en el ala este del layout comienzan a incrementarse."
+            },
+            {
+                estados: ['llena', 'llena', 'llena', 'config-llenando', 'vacía', 'vacía'],
+                desc: "⚠️ **Paso 4 (Umbral de Alerta):** Se inicia el llenado de la **Cámara 9**. El espacio libre remanente se reduce. El sistema detecta que se acerca el límite del colchón de seguridad obligatorio."
             },
             {
                 estados: ['llena', 'llena', 'llena', 'llena', 'vacía', 'vacía'],
-                desc: "💥 CRÍTICO: Se llenó la Cámara 9. Quedan exactamente 2 vacías (10 y 11). Se dispara la orden de INTERPLANTA."
+                desc: "🚨 **Paso 5 (Hito Crítico - Alerta):** Se completó la Cámara 9. Quedan estrictamente **2 cámaras vacías (10 y 11)**. Esta condición técnica dispara de forma automática la **Alerta de Interplanta** para evitar bloqueos."
             },
             {
-                estados: ['vaciando', 'llena', 'llena', 'llena', 'llenando', 'vacía'],
-                desc: "Fase 4 (Gatillo): Se inicia el vaciado (FIFO) de la Cámara 6 hacia interplanta. En paralelo, la producción llena la Cámara 10."
+                estados: ['vaciando', 'llena', 'llena', 'llena', 'config-llenando', 'vacía'],
+                desc: "⚡ **Paso 6 (Gatillo Operativo):** ¡Acción de choque! Se inicia el transporte por camiones interplanta aplicando **FIFO estricto** desde la **Cámara 6** (la más antigua). En paralelo, la producción sigue llenando la **Cámara 10**."
             },
             {
-                estados: ['vacía', 'vaciando', 'llena', 'llena', 'llena', 'llenando'],
-                desc: "Fase 5: La Cámara 6 quedó liberada (vuelve al pulmón). Ahora se vacía la 7 y se empieza a llenar la última disponible (Cámara 11)."
+                estados: ['vacía', 'vaciando', 'llena', 'llena', 'llena', 'config-llenando'],
+                desc: "🔄 **Paso 7 (Desbloqueo de Pulmón):** La Cámara 6 ha quedado totalmente evacuada y libre, regresando al pool de reserva. La logística interplanta se mueve ahora a vaciar la **Cámara 7**, mientras producción utiliza la **Cámara 11**."
             },
             {
-                estados: ['llenando', 'vacía', 'vaciando', 'llena', 'llena', 'llena'],
-                desc: "Fase 6 (Ciclo Continuo): La Cámara 7 se liberó. El llenado vuelve a empezar en la Cámara 6. Se mantiene el flujo constante respetando el colchón de seguridad."
+                estados: ['config-llenando', 'vacía', 'vaciando', 'llena', 'llena', 'llena'],
+                desc: "🔄 **Paso 8 (Ciclo Continuo Cerrado):** Se liberó la Cámara 7. Al estar la cabecera disponible, el flujo de producción vuelve a ingresar a la **Cámara 6** en sentido horario, manteniendo el movimiento continuo de stock."
+            },
+            {
+                estados: ['llena', 'config-llenando', 'vacía', 'vaciando', 'llena', 'llena'],
+                desc: "🔄 **Paso 9 (Evolución Dinámica):** El ciclo se consolida. Se evacúa la Cámara 8 hacia interplanta y la producción vuelve a completar la Cámara 6 para saltar nuevamente a la 7."
+            },
+            {
+                estados: ['llena', 'llena', 'config-llenando', 'vacía', 'vaciando', 'llena'],
+                desc: "🔄 **Paso 10 (Estabilidad Operativa):** Demostración del balance de masa. El pulmón se auto-regula manteniendo siempre stock amortiguador disponible y garantizando cero paradas en la línea de producción industrial."
             }
         ];
 
-        function renderizarCamaras() {
-            const contenedor = document.getElementById('contenedor-camaras');
+        function renderizarEstructuraReloj() {
+            const contenedor = document.getElementById('reloj-camaras');
             contenedor.innerHTML = '';
 
-            camarasConfig.forEach((num, index) => {
-                const estado = estadosCamaras[index];
-                let colorClase = 'bg-gray-700 border-gray-600';
-                let textoEstado = 'VACÍA';
-                let BadgeClase = 'bg-gray-600';
+            // Obtener el estado actual según el array de pasos
+            const estadosActuales = pasosSimulacion[pasoActual].estados;
 
-                if (estado === 'llenando') {
-                    colorClase = 'bg-blue-900 border-blue-500 ring-2 ring-blue-400';
-                    textoEstado = 'LLENANDO';
-                    BadgeClase = 'bg-blue-500 animate-pulse';
+            camarasConfig.forEach((num, index) => {
+                const estado = estadosActuales[index];
+                
+                let cardEstilos = 'bg-slate-900 border-slate-800 text-slate-400';
+                let badgeEstilos = 'bg-slate-800 text-slate-400';
+                let textoEstado = 'VACÍA';
+                let glowEfecto = '';
+
+                if (estado === 'config-llenando') {
+                    cardEstilos = 'bg-cyan-950/90 border-cyan-500 text-cyan-200 ring-2 ring-cyan-400/30';
+                    badgeEstilos = 'bg-cyan-500 text-slate-950 font-bold animate-pulse';
+                    textoEstado = 'RECIBIENDO';
+                    glowEfecto = 'shadow-lg shadow-cyan-500/10';
                 } else if (estado === 'llena') {
-                    colorClase = 'bg-red-950 border-red-700';
+                    cardEstilos = 'bg-emerald-950/80 border-emerald-700 text-emerald-200';
+                    badgeEstilos = 'bg-emerald-600 text-white font-medium';
                     textoEstado = 'LLENA';
-                    BadgeClase = 'bg-red-600';
                 } else if (estado === 'vaciando') {
-                    colorClase = 'bg-yellow-950 border-yellow-600 ring-2 ring-yellow-400';
-                    textoEstado = 'VACIANDO';
-                    BadgeClase = 'bg-yellow-500 text-gray-900 font-bold animate-pulse';
+                    cardEstilos = 'bg-amber-950/90 border-amber-500 text-amber-200 ring-2 ring-amber-400/30';
+                    badgeEstilos = 'bg-amber-500 text-slate-950 font-black animate-pulse';
+                    textoEstado = 'DESPACHO';
+                    glowEfecto = 'shadow-lg shadow-amber-500/10';
                 }
 
+                // Armado del nodo con clases pos-0 a pos-5 para respetar el sentido horario de las agujas
                 contenedor.innerHTML += `
-                    <div class="border rounded-xl p-4 flex flex-col items-center justify-between min-h-[140px] shadow-lg transition-all duration-300 ${colorClase}">
-                        <span class="text-xs text-gray-400 font-bold">CÁMARA</span>
-                        <span class="text-4xl font-extrabold my-2">${num}</span>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full font-semibold text-white ${BadgeClase}">${textoEstado}</span>
+                    <div class="camara-node pos-${index} ${glowEfecto} w-[92px] h-[92px] border rounded-2xl flex flex-col items-center justify-center p-2 text-center select-none ${cardEstilos}">
+                        <span class="text-[9px] uppercase tracking-widest opacity-60 font-bold">Cam</span>
+                        <span class="text-2xl font-black tracking-tight my-0.5">${num}</span>
+                        <span class="text-[8px] px-1.5 py-0.5 rounded-md tracking-wide font-extrabold ${badgeEstilos}">${textoEstado}</span>
                     </div>
                 `;
             });
+
+            actualizarKPIs(estadosActuales);
+        }
+
+        function actualizarKPIs(estados) {
+            // Contadores para métricas
+            const llenas = estados.filter(e => e === 'llena').length;
+            const enProceso = estados.filter(e => e === 'config-llenando' || e === 'vaciando').length;
+            const vacias = estados.filter(e => e === 'vacía').length;
+
+            // Porcentaje representativo para gerencia
+            const porcentajeOcupacion = Math.round(((llenas + (enProceso * 0.5)) / 6) * 100);
+            
+            document.getElementById('kpi-ocupacion').innerText = `${porcentajeOcupacion}%`;
+            document.getElementById('kpi-libres').innerText = vacias;
+
+            // Control de texto del gatillo de interplanta
+            const kpiInterplanta = document.getElementById('kpi-interplanta');
+            if (estados.includes('vaciando')) {
+                kpiInterplanta.innerText = "ACTIVO (FIFO)";
+                kpiInterplanta.className = "text-xs font-black bg-amber-500 text-slate-950 px-2 py-0.5 rounded mt-1 block animate-pulse";
+            } else if (pasoActual === 5) {
+                kpiInterplanta.innerText = "ALERTA CRÍTICA";
+                kpiInterplanta.className = "text-xs font-black bg-red-600 text-white px-2 py-0.5 rounded mt-1 block animate-bounce";
+            } else {
+                kpiInterplanta.innerText = "PASIVO";
+                kpiInterplanta.className = "text-xs font-bold bg-slate-800 text-slate-400 px-2 py-0.5 rounded mt-1 block";
+            }
+
+            // Actualizar etiqueta del contador de pasos de la presentación
+            document.getElementById('contador-pasos').innerText = `Paso: ${pasoActual} / 10`;
         }
 
         function avanzarPaso() {
-            if (pasoActual < pasosSimulacion.length) {
-                estadosCamaras = pasosSimulacion[pasoActual].estados;
-                document.getElementById('descripcion-estado').innerText = pasosSimulacion[pasoActual].desc;
-                renderizarCamaras();
+            if (pasoActual < pasosSimulacion.length - 1) {
                 pasoActual++;
             } else {
-                document.getElementById('descripcion-estado').innerText = "Fin de la demostración del ciclo. Reiniciando para volver a ver...";
-                pasoActual = 0;
+                pasoActual = 0; // Reinicio automático al terminar el ciclo para la demo interactiva
             }
+            
+            // Reemplazo de marcadores Markdown sencillos para renderizar negritas en el cuadro de texto
+            let descFormateada = pasosSimulacion[pasoActual].desc
+                .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>')
+                .replace(/--(.*?)--/g, '<span class="text-amber-400 font-bold">$1</span>');
+
+            document.getElementById('descripcion-estado').innerHTML = descFormateada;
+            renderizarEstructuraReloj();
         }
 
         function reiniciarSimulacion() {
-            estadosCamaras = Array(6).fill('vacía');
             pasoActual = 0;
-            document.getElementById('descripcion-estado').innerText = 'Presioná "Avanzar" para iniciar la recepción en la Cámara 6.';
-            renderizarCamaras();
+            document.getElementById('descripcion-estado').innerHTML = "Presioná el botón verde para iniciar la simulación secuencial de llenado en sentido horario desde la cabecera (Cámara 6).";
+            renderizarEstructuraReloj();
         }
 
-        // Render inicial
-        renderizarCamaras();
+        // Ejecución del renderizado inicial en la carga de la suite
+        renderizarEstructuraReloj();
     </script>
 </body>
 </html>
