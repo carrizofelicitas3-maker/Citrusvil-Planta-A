@@ -3,16 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Citrusvil | Simulador Operativo Cámaras de Frío 6-11</title>
+    <title>Citrusvil | Planta A</title>
     <!-- Tailwind CSS v4 -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* Distribución radial simulando el flujo horario */
+        /* Distribución radial adaptable */
         .clock-container {
             position: relative;
-            width: 360px;
-            height: 360px;
+            width: 290px;
+            height: 290px;
             border-radius: 50%;
+        }
+        @media (min-width: 640px) {
+            .clock-container {
+                width: 360px;
+                height: 360px;
+            }
         }
         .camara-node {
             position: absolute;
@@ -20,134 +26,127 @@
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         /* Posiciones horarias exactas de las 6 cámaras */
-        .pos-0 { top: 12%; left: 50%; }   /* Cámara 6 - Arriba (12hs) */
-        .pos-1 { top: 31%; left: 83%; }   /* Cámara 7 - (2hs) */
-        .pos-2 { top: 69%; left: 83%; }   /* Cámara 8 - (4hs) */
-        .pos-3 { top: 88%; left: 50%; }   /* Cámara 9 - Abajo (6hs) */
-        .pos-4 { top: 69%; left: 17%; }   /* Cámara 10 - (8hs) */
-        .pos-5 { top: 31%; left: 17%; }   /* Cámara 11 - (10hs) */
+        .pos-0 { top: 12%; left: 50%; }   /* Cámara 6 */
+        .pos-1 { top: 31%; left: 83%; }   /* Cámara 7 */
+        .pos-2 { top: 69%; left: 83%; }   /* Cámara 8 */
+        .pos-3 { top: 88%; left: 50%; }   /* Cámara 9 */
+        .pos-4 { top: 69%; left: 17%; }   /* Cámara 10 */
+        .pos-5 { top: 31%; left: 17%; }   /* Cámara 11 */
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen font-sans antialiased">
 
     <div class="max-w-6xl mx-auto p-4 md:p-8">
         
-        <!-- Encabezado Corporativo Citrusvil -->
-        <header class="flex flex-col md:flex-row md:items-center md:justify-between border-b border-slate-200 pb-6 mb-8 gap-4">
-            <div>
-                <div class="flex items-center gap-2">
-                    <span class="bg-emerald-700 text-white text-xs font-black px-3 py-0.5 rounded tracking-wider">CITRUSVIL</span>
-                    <span class="text-slate-400 text-xs font-bold tracking-wider">PLANTA A</span>
-                </div>
-                <h1 class="text-2xl font-black text-slate-900 mt-1 tracking-tight">
-                    Simulador Operativo: <span class="text-emerald-700">Cámaras de Frío 6 a 11</span>
-                </h1>
-                <p class="text-slate-500 text-sm mt-0.5">Análisis predictivo de ocupación de cámaras de frío 6 a 11.</p>
+        <!-- Encabezado Corporativo Citrusvil (Limpio, sin el tablero arriba) -->
+        <header class="border-b border-slate-200 pb-5 mb-6">
+            <div class="flex items-center gap-2">
+                <span class="bg-emerald-700 text-white text-[10px] font-black px-2.5 py-0.5 rounded tracking-wider">CITRUSVIL</span>
+                <span class="text-slate-400 text-xs font-bold tracking-wider">PLANTA A</span>
             </div>
-            
-            <!-- Tablero de Control Ejecutivo (Ocupación, Libres, Interplanta) -->
-            <div class="flex gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                <div class="text-center px-4 border-r border-slate-100">
-                    <span class="text-[10px] text-slate-400 block font-bold tracking-widest uppercase">Ocupación</span>
-                    <span id="kpi-ocupacion" class="text-2xl font-black text-emerald-700">0%</span>
-                </div>
-                <div class="text-center px-4 border-r border-slate-100">
-                    <span class="text-[10px] text-slate-400 block font-bold tracking-widest uppercase">Cámaras Libres</span>
-                    <span id="kpi-libres" class="text-2xl font-black text-slate-700">6</span>
-                </div>
-                <div class="text-center px-2">
-                    <span class="text-[10px] text-slate-400 block font-bold tracking-widest uppercase">Interplanta</span>
-                    <span id="kpi-interplanta" class="text-xs font-bold bg-slate-100 text-slate-500 px-3 py-1 rounded-md mt-1.5 block tracking-wide">STANDBY</span>
-                </div>
-            </div>
+            <h1 class="text-xl md:text-2xl font-black text-slate-900 mt-1 tracking-tight">
+                Análisis predictivo de ocupación de cámaras de frío 6 a 11
+            </h1>
         </header>
 
-        <!-- Contenedor Principal del Dashboard -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <!-- Layout Adaptable (Celular / Computadora) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
-            <!-- PANEL IZQUIERDO: Consola de Cronograma y Balance (7 Columnas) -->
-            <div class="lg:col-span-7 space-y-6">
-                <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-                    <div class="flex items-center justify-between mb-5">
-                        <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+            <!-- PANEL IZQUIERDO: Tablero de Control y Consola de Datos -->
+            <div class="lg:col-span-7 space-y-5">
+                
+                <!-- Tablero de Control Reubicado -->
+                <div class="grid grid-cols-3 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <div class="text-center border-r border-slate-100">
+                        <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Ocupación</span>
+                        <span id="kpi-ocupacion" class="text-lg md:text-2xl font-black text-emerald-700">0%</span>
+                    </div>
+                    <div class="text-center border-r border-slate-100">
+                        <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Cámaras Libres</span>
+                        <span id="kpi-libres" class="text-lg md:text-2xl font-black text-slate-700">6</span>
+                    </div>
+                    <div class="text-center flex flex-col justify-center items-center px-1">
+                        <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Interplanta</span>
+                        <span id="kpi-interplanta" class="text-[10px] font-bold bg-slate-100 text-slate-500 px-2 py-0.5 rounded mt-1 block tracking-wide truncate w-full max-w-[90px]">STANDBY</span>
+                    </div>
+                </div>
+
+                <!-- Consola Operativa -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 md:p-6 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
-                            Progreso Operativo por Jornada
+                            Progreso Operativo
                         </h2>
-                        <span id="contador-dias" class="text-xs font-bold bg-emerald-50 text-emerald-800 px-3 py-1 rounded-full border border-emerald-100">Estado Inicial</span>
+                        <span id="contador-dias" class="text-xs font-bold bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-100">Estado Inicial</span>
                     </div>
 
-                    <!-- Botones de Acción -->
-                    <div class="flex flex-wrap gap-3 mb-6">
-                        <button id="btn-siguiente" onclick="avanzarDia()" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3.5 px-6 rounded-xl transition duration-150 shadow-md shadow-emerald-700/10 flex items-center justify-center gap-2 cursor-pointer text-sm tracking-wide">
-                            Avanzar Día Operativo <span class="text-base">▶</span>
+                    <!-- Botones de Acción adaptables -->
+                    <div class="flex gap-3 mb-4">
+                        <button id="btn-siguiente" onclick="avanzarDia()" class="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl transition shadow-md shadow-emerald-700/10 flex items-center justify-center gap-2 cursor-pointer text-xs md:text-sm tracking-wide">
+                            Avanzar Día Operativo <span>▶</span>
                         </button>
-                        <button onclick="reiniciarSimulacion()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 px-5 rounded-xl transition cursor-pointer text-sm">
+                        <button onclick="reiniciarSimulacion()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 px-4 rounded-xl transition cursor-pointer text-xs md:text-sm">
                             Reiniciar
                         </button>
                     </div>
 
-                    <!-- Métricas de la Operación del Día (Texto Justo y Necesario) -->
-                    <div class="p-5 bg-slate-50 rounded-xl border border-slate-200/60 relative overflow-hidden">
+                    <!-- Métricas de la Operación (Limpio y Técnico) -->
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200/60 relative overflow-hidden">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-emerald-700"></div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm" id="datos-operacion">
-                            <!-- Inyección dinámica de datos concretos del día -->
-                            <div class="col-span-2 text-slate-500 italic">
-                                Presioná "Avanzar Día Operativo" para visualizar el comportamiento de la tasa de llenado y vaciado sincronizado.
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm" id="datos-operacion">
+                            <div class="col-span-1 sm:col-span-2 text-slate-500 italic">
+                                Presioná "Avanzar Día Operativo" para iniciar la simulación del comportamiento de la tasa de llenado y vaciado.
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- PANEL DERECHO: Layout Circular Tipo Reloj (5 Columnas) -->
-            <div class="lg:col-span-5 flex flex-col items-center bg-white border border-slate-200 p-6 rounded-2xl shadow-sm">
-                <h3 class="text-xs font-bold text-slate-400 mb-6 tracking-widest uppercase">Disposición de Cámaras (Planta A)</h3>
+            <!-- PANEL DERECHO: Layout Circular (Visualmente independiente) -->
+            <div class="lg:col-span-5 flex flex-col items-center bg-white border border-slate-200 p-4 md:p-6 rounded-2xl shadow-sm">
+                <h3 class="text-[10px] md:text-xs font-bold text-slate-400 mb-4 md:mb-6 tracking-widest uppercase">Layout de Cámaras (Flujo Horario)</h3>
                 
-                <!-- Estructura del Reloj -->
+                <!-- Contenedor Anillo Adaptable -->
                 <div class="clock-container my-2 bg-slate-50 border border-slate-200/80 flex items-center justify-center shadow-inner">
-                    
-                    <!-- Centro del Reloj -->
-                    <div class="w-32 h-32 rounded-full bg-white border border-slate-200 flex flex-col items-center justify-center text-center p-2 z-10 shadow-sm">
-                        <span class="text-[9px] text-slate-400 font-bold tracking-widest">FLUJO</span>
-                        <span class="text-xs font-black text-emerald-800 tracking-wider">HORARIO</span>
-                        <svg class="w-5 h-5 text-emerald-600/80 mt-1.5 animate-spin" style="animation-duration: 25s" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-white border border-slate-200 flex flex-col items-center justify-center text-center p-2 z-10 shadow-sm">
+                        <span class="text-[8px] sm:text-[9px] text-slate-400 font-bold tracking-widest">FLUJO</span>
+                        <span class="text-[10px] sm:text-xs font-black text-emerald-800 tracking-wider">HORARIO</span>
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600/80 mt-1 animate-spin" style="animation-duration: 25s" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
                         </svg>
                     </div>
-
-                    <!-- Cámaras Dinámicas -->
                     <div id="reloj-camaras" class="absolute inset-0 w-full h-full"></div>
                 </div>
 
-                <!-- Referencias de Estado -->
-                <div class="w-full grid grid-cols-2 gap-2 mt-6 pt-4 border-t border-slate-100 text-[11px] font-medium text-slate-500">
+                <!-- Referencias de Estado adaptables -->
+                <div class="w-full grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 text-[10px] md:text-[11px] font-medium text-slate-500">
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/40">
-                        <div class="w-3 h-3 bg-white border border-slate-300 rounded shadow-sm"></div>
+                        <div class="w-2.5 h-2.5 bg-white border border-slate-300 rounded"></div>
                         <span>Disponible</span>
                     </div>
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/40">
-                        <div class="w-3 h-3 bg-sky-500 animate-pulse rounded shadow-sm"></div>
-                        <span>Ingreso (Producción)</span>
+                        <div class="w-2.5 h-2.5 bg-sky-500 animate-pulse rounded"></div>
+                        <span>Ingreso</span>
                     </div>
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/40">
-                        <div class="w-3 h-3 bg-emerald-700 rounded shadow-sm"></div>
-                        <span>Capacidad Completa</span>
+                        <div class="w-2.5 h-2.5 bg-emerald-700 rounded"></div>
+                        <span>Completa</span>
                     </div>
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/40">
-                        <div class="w-3 h-3 bg-amber-500 animate-pulse rounded shadow-sm"></div>
-                        <span>Despacho (Interplanta)</span>
+                        <div class="w-2.5 h-2.5 bg-amber-500 animate-pulse rounded"></div>
+                        <span>Despacho</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Lógica de Operación de Datos Sincronizada -->
+    <!-- Lógica Operativa Sincronizada -->
     <script>
         const camarasConfig = [6, 7, 8, 9, 10, 11];
         let diaActual = 0;
 
-        // Base de datos del comportamiento diario (Llenado/Vaciado cada 2 días a ritmo de producción)
         const cronogramaDias = [
             {
                 dia: "Estado Inicial",
@@ -190,7 +189,7 @@
                 ingreso: "Cámara 9 (En proceso)", despacho: "Inactivo", balance: "Último espacio buffer antes de gatillo."
             },
             {
-                dia: "Día 8 (Gatillo Operativo)",
+                dia: "Día 8",
                 estados: ['vaciando', 'llena', 'llena', 'llena', 'llenando', 'vacía'],
                 ingreso: "Cámara 10 (En proceso)", despacho: "Cámara 6 (FIFO Activo)", balance: "Sincronización total: Ritmo de vaciado iguala al de producción."
             },
@@ -200,7 +199,7 @@
                 ingreso: "Cámara 11 (En proceso)", despacho: "Cámara 7 (FIFO Activo)", balance: "Cámara 6 liberada. Continuidad de despacho interplanta."
             },
             {
-                dia: "Día 10 (Ciclo Infinito)",
+                dia: "Día 10",
                 estados: ['llenando', 'vacía', 'vaciando', 'llena', 'llena', 'llena'],
                 ingreso: "Cámara 6 (Re-ingreso)", despacho: "Cámara 8 (FIFO Activo)", balance: "Cámara 7 liberada. El flujo regresa al origen cerrando el anillo."
             }
@@ -238,10 +237,10 @@
                 }
 
                 contenedor.innerHTML += `
-                    <div class="camara-node pos-${index} ${shadowGlow} w-[94px] h-[94px] border rounded-2xl flex flex-col items-center justify-center p-2 text-center select-none ${cardEstilos}">
-                        <span class="text-[9px] uppercase tracking-widest opacity-50 font-bold">Cámara</span>
-                        <span class="text-2xl font-black tracking-tight my-0.5">${num}</span>
-                        <span class="text-[8px] px-2 py-0.5 rounded font-extrabold tracking-wide ${badgeEstilos}">${textoEstado}</span>
+                    <div class="camara-node pos-${index} ${shadowGlow} w-[76px] h-[76px] sm:w-[94px] sm:h-[94px] border rounded-2xl flex flex-col items-center justify-center p-1.5 text-center select-none ${cardEstilos}">
+                        <span class="text-[8px] sm:text-[9px] uppercase tracking-widest opacity-50 font-bold">Cam</span>
+                        <span class="text-xl sm:text-2xl font-black tracking-tight my-0.5">${num}</span>
+                        <span class="text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded font-extrabold tracking-wide ${badgeEstilos}">${textoEstado}</span>
                     </div>
                 `;
             });
@@ -263,35 +262,34 @@
             const kpiInterplanta = document.getElementById('kpi-interplanta');
             if (estados.includes('vaciando')) {
                 kpiInterplanta.innerText = "ACTIVO";
-                kpiInterplanta.className = "text-xs font-black bg-amber-500 text-slate-950 px-3 py-1 rounded-md mt-1.5 block animate-pulse tracking-wide";
+                kpiInterplanta.className = "text-[10px] font-black bg-amber-500 text-slate-950 px-2 py-0.5 rounded mt-1 block animate-pulse tracking-wide truncate w-full max-w-[90px]";
             } else {
                 kpiInterplanta.innerText = "STANDBY";
-                kpiInterplanta.className = "text-xs font-bold bg-slate-100 text-slate-400 px-3 py-1 rounded-md mt-1.5 block tracking-wide";
+                kpiInterplanta.className = "text-[10px] font-bold bg-slate-100 text-slate-400 px-2 py-0.5 rounded mt-1 block tracking-wide truncate w-full max-w-[90px]";
             }
 
             document.getElementById('contador-dias').innerText = datos.dia;
 
-            // Renderizado de información directa y justa (Evitando textos largos)
             const contenedorDatos = document.getElementById('datos-operacion');
             if (diaActual === 0) {
                 contenedorDatos.innerHTML = `
-                    <div class="col-span-2 text-slate-500 italic">
-                        Presioná "Avanzar Día Operativo" para visualizar el comportamiento de la tasa de llenado y vaciado sincronizado.
+                    <div class="col-span-1 sm:col-span-2 text-slate-500 italic text-center py-2">
+                        Presioná "Avanzar Día Operativo" para iniciar la simulación del comportamiento de la tasa de llenado y vaciado.
                     </div>
                 `;
             } else {
                 contenedorDatos.innerHTML = `
                     <div>
-                        <span class="text-xs font-bold text-slate-400 block uppercase tracking-wider">Flujo de Ingreso:</span>
-                        <span class="text-sm font-bold text-slate-700">${datos.ingreso}</span>
+                        <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Flujo de Ingreso:</span>
+                        <span class="text-xs md:text-sm font-bold text-slate-700">${datos.ingreso}</span>
                     </div>
                     <div>
-                        <span class="text-xs font-bold text-slate-400 block uppercase tracking-wider">Tránsito Interplanta:</span>
-                        <span class="text-sm font-bold text-slate-700">${datos.despacho}</span>
+                        <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Tránsito Interplanta:</span>
+                        <span class="text-xs md:text-sm font-bold text-slate-700">${datos.despacho}</span>
                     </div>
-                    <div class="col-span-2 pt-2 border-t border-slate-200/60 mt-1">
-                        <span class="text-xs font-bold text-slate-400 block uppercase tracking-wider">Balance de Masa:</span>
-                        <span class="text-sm font-medium text-slate-600">${datos.balance}</span>
+                    <div class="col-span-1 sm:col-span-2 pt-2 border-t border-slate-200/60 mt-1">
+                        <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Estado del Pulmón Dinámico:</span>
+                        <span class="text-xs md:text-sm font-medium text-slate-600">${datos.balance}</span>
                     </div>
                 `;
             }
@@ -301,7 +299,7 @@
             if (diaActual < cronogramaDias.length - 1) {
                 diaActual++;
             } else {
-                diaActual = 1; // Loop al Día 1 para mantener fluida la demostración interactiva
+                diaActual = 1; 
             }
             renderizarReloj();
         }
@@ -311,7 +309,6 @@
             renderizarReloj();
         }
 
-        // Carga inicial del Layout corporativo
         renderizarReloj();
     </script>
 </body>
