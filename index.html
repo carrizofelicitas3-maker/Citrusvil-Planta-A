@@ -55,6 +55,7 @@
             </h1>
         </header>
 
+        <!-- CONFIGURACIÓN DE ESCENARIOS OPERATIVOS -->
         <div class="mb-6 bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Configuración de Cámaras Disponibles para Ingreso</h3>
@@ -72,6 +73,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             
+            <!-- CONTROLES Y MÉTRICAS -->
             <div class="lg:col-span-7 space-y-5">
                 
                 <div class="grid grid-cols-3 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
@@ -98,6 +100,7 @@
                         <span id="contador-dias" class="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-200">Paso 1</span>
                     </div>
 
+                    <!-- BOTONERA DE CONTROL HISTÓRICO -->
                     <div class="grid grid-cols-12 gap-2 mb-4">
                         <button onclick="retrocederDia()" class="col-span-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-2 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer text-xs tracking-wide border border-slate-200/60">
                             <span>◀</span> Volver
@@ -113,11 +116,13 @@
                     <div class="p-4 bg-slate-50 rounded-xl border border-slate-200/60 relative overflow-hidden">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-600"></div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm" id="datos-operacion">
-                            </div>
+                            <!-- Inyectado por JS -->
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- ANILLO VISUAL DE CÁMARAS -->
             <div class="lg:col-span-5 flex flex-col items-center bg-white border border-slate-200 p-4 md:p-6 rounded-2xl shadow-sm">
                 
                 <div class="clock-container my-4 bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner">
@@ -133,6 +138,7 @@
                     <div id="reloj-camaras" class="absolute inset-0 w-full h-full"></div>
                 </div>
 
+                <!-- REFERENCIAS -->
                 <div class="w-full grid grid-cols-2 gap-2 mt-2 pt-4 border-t border-slate-100 text-[10px] md:text-[11px] font-semibold text-slate-500">
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/60">
                         <div class="w-2.5 h-2.5 bg-white border border-slate-300 rounded"></div>
@@ -161,8 +167,7 @@
         let modoActual = 'real';
 
         /* ESCENARIO REAL: 1 Disponible (83% Ocupación)
-           Lógica FIFO estricta y adyacente: El vaciado por interplanta se realiza en la cámara inmediatamente 
-           siguiente (sentido horario) a la que se está llenando por producción.
+           Lógica FIFO adyacente: El vaciado ocurre en la cámara inmediatamente siguiente a la que se llena.
         */
         const cronogramaReal = [
             { paso: "Paso 1", estados: ['llenando', 'vaciando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 6", despacho: "Cámara 7", ciclo: 0, obs: "Sincronismo FIFO: ingreso activo en Cámara 6. En paralelo, la Cámara 7 (la más antigua) se desborda hacia interplanta." },
@@ -182,24 +187,24 @@
         ];
 
         /* ESCENARIO IDEAL: 2 Disponibles (66% Ocupación)
-           Mismo principio FIFO adyacente, pero dejando una cámara completamente VACÍA por delante del vaciado, 
-           lo que otorga flexibilidad total para recibir producto sin depender del fin inmediato de la interplanta.
+           CORREGIDO: El ingreso va en N, la cámara N+1 está VACÍA (disponible sin interrupción), y la 
+           cámara N+2 (que está LLENA de stock antiguo) es la que se vacía por interplanta. Nunca se vacía una celda vacía.
         */
         const cronogramaIdeal = [
-            { paso: "Paso 1", estados: ['llenando', 'vaciando', 'vacía', 'llena', 'llena', 'llena'], ingreso: "Cámara 6", despacho: "Cámara 7", ciclo: 0, obs: "Margen ideal: ingreso en Cámara 6 y despacho en 7. La Cámara 8 queda libre y vacía como colchón de maniobra." },
-            { paso: "Paso 2", estados: ['llena', 'llenando', 'vaciando', 'vacía', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 8", ciclo: 0, obs: "Holgura operativa: rotación a ingreso en Cámara 7 y salida en 8. La Cámara 9 queda vacía en espera preventiva." },
-            { paso: "Paso 3", estados: ['llena', 'llena', 'llenando', 'vaciando', 'vacía', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 9", ciclo: 0, obs: "Eficiencia protegida: entrada activa en Cámara 8 y vaciado en la 9. La Cámara 10 se mantiene libre de stock." },
-            { paso: "Paso 4", estados: ['llena', 'llena', 'llena', 'llenando', 'vaciando', 'vacía'], ingreso: "Cámara 9", despacho: "Cámara 10", ciclo: 0, obs: "Flujo desacoplado: producción derivada a Cámara 9; la 10 se transfiere y la 11 permanece lista y disponible." },
-            { paso: "Paso 5", estados: ['vacía', 'llena', 'llena', 'llena', 'llenando', 'vaciando'], ingreso: "Cámara 10", despacho: "Cámara 11", ciclo: 0, obs: "Continuidad sin demoras: ingreso en Cámara 10, vaciado en la 11 y la Cámara 6 queda completamente limpia." },
-            { paso: "Paso 6", estados: ['vaciando', 'vacía', 'llena', 'llena', 'llena', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 6", ciclo: 1, obs: "¡Primer ciclo ideal completo! El anillo gira hacia la Cámara 11 asegurando la disponibilidad total de la 7." },
+            { paso: "Paso 1", estados: ['llenando', 'vacía', 'vaciando', 'llena', 'llena', 'llena'], ingreso: "Cámara 6", despacho: "Cámara 8", ciclo: 0, obs: "Máxima holgura: Ingreso en C6. La C7 queda 100% vacía y disponible. La interplanta drena el stock antiguo de C8." },
+            { paso: "Paso 2", estados: ['llena', 'llenando', 'vacía', 'vaciando', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 9", ciclo: 0, obs: "Giro limpio: El ingreso salta a C7, C8 pasa a estar limpia/disponible, y la evacuación avanza a extraer la C9." },
+            { paso: "Paso 3", estados: ['llena', 'llena', 'llenando', 'vacía', 'vaciando', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 10", ciclo: 0, obs: "Colchón preventivo: Producción ingresa a C8. C9 queda como pulmón desocupado. C10 ejecuta interplanta." },
+            { paso: "Paso 4", estados: ['llena', 'llena', 'llena', 'llenando', 'vacía', 'vaciando'], ingreso: "Cámara 9", despacho: "Cámara 11", ciclo: 0, obs: "Secuencia protegida: Entrada en C9, C10 se preserva vacía sin interrupciones, y se vacía el stock de C11." },
+            { paso: "Paso 5", estados: ['vaciando', 'llena', 'llena', 'llena', 'llenando', 'vacía'], ingreso: "Cámara 10", despacho: "Cámara 6", ciclo: 0, obs: "Rotación de buffers: C10 en llenado, C11 disponible en espera y la C6 drena los pallets consolidados." },
+            { paso: "Paso 6", estados: ['vacía', 'vaciando', 'llena', 'llena', 'llena', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 7", ciclo: 1, obs: "¡Primer ciclo ideal! C11 recibe el flujo, C6 queda vacía y disponible, mientras C7 se vacía por interplanta." },
             
             // SEGUNDO CICLO COMPLETO
-            { paso: "Paso 7", estados: ['llenando', 'vaciando', 'vacía', 'llena', 'llena', 'llena'], ingreso: "Cámara 6", despacho: "Cámara 7", ciclo: 1, obs: "Vuelta 2 - Ritmo constante: se inicia el segundo ciclo en Cámara 6 con la máxima flexibilidad del buffer de seguridad." },
-            { paso: "Paso 8", estados: ['llena', 'llenando', 'vaciando', 'vacía', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 8", ciclo: 1, obs: "Sincronización perfecta: rotación sin fricciones. Ingreso en Cámara 7 y evacuación controlada en Cámara 8." },
-            { paso: "Paso 9", estados: ['llena', 'llena', 'llenando', 'vaciando', 'vacía', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 9", ciclo: 1, obs: "Logística interna ágil: el ingreso en Cámara 8 opera liberado de presiones gracias a la ventana de la Cámara 10." },
-            { paso: "Paso 10", estados: ['llena', 'llena', 'llena', 'llenando', 'vaciando', 'vacía'], ingreso: "Cámara 9", despacho: "Cámara 10", ciclo: 1, obs: "Optimización de stock: Cámara 9 absorbe la carga diaria mientras la 10 agiliza el tránsito hacia la otra planta." },
-            { paso: "Paso 11", estados: ['vacía', 'llena', 'llena', 'llena', 'llenando', 'vaciando'], ingreso: "Cámara 10", despacho: "Cámara 11", ciclo: 1, obs: "Control de capacidad: la Cámara 10 avanza de forma coordinada con la salida de pallets de la Cámara 11." },
-            { paso: "Paso 12", estados: ['vaciando', 'vacía', 'llena', 'llena', 'llena', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 6", ciclo: 2, obs: "¡Simulación ideal completada! Dos vueltas perfectas demostrando los beneficios de trabajar con un pulmón libre." }
+            { paso: "Paso 7", estados: ['llenando', 'vacía', 'vaciando', 'llena', 'llena', 'llena'], ingreso: "Cámara 6", despacho: "Cámara 8", ciclo: 1, obs: "Vuelta 2: El ingreso regresa a C6. La C7 queda vacía como amortiguador y la C8 reanuda el bombeo a Planta B." },
+            { paso: "Paso 8", estados: ['llena', 'llenando', 'vacía', 'vaciando', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 9", ciclo: 1, obs: "Régimen equilibrado: Ingreso en C7 con resguardo absoluto en C8. Interplanta en ejecución sobre C9." },
+            { paso: "Paso 9", estados: ['llena', 'llena', 'llenando', 'vacía', 'vaciando', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 10", ciclo: 1, obs: "Flujo constante: C8 absorbe el ingreso diario, dejando C9 libre de ocupación. C10 libera sus posiciones." },
+            { paso: "Paso 10", estados: ['llena', 'llena', 'llena', 'llenando', 'vacía', 'vaciando'], ingreso: "Cámara 9", despacho: "Cámara 11", ciclo: 1, obs: "Tránsito fluido: Avance a C9 en recepción de pallets, C10 vacía para logística ágil y C11 en despacho." },
+            { paso: "Paso 11", estados: ['vaciando', 'llena', 'llena', 'llena', 'llenando', 'vacía'], ingreso: "Cámara 10", despacho: "Cámara 6", ciclo: 1, obs: "Penúltimo paso: Conexión de entrada en C10 y despacho de fruta madura en C6. C11 lista en reserva." },
+            { paso: "Paso 12", estados: ['vacía', 'vaciando', 'llena', 'llena', 'llena', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 7", ciclo: 2, obs: "¡Segundo ciclo ideal completo! 2 vueltas perfectas demostrando la seguridad del canal con 2 disponibles." }
         ];
 
         function getCronograma() {
