@@ -144,10 +144,10 @@
         const camarasConfig = [6, 7, 8, 9, 10, 11];
         let diaActual = 0;
 
-        /* CRONOGRAMA FIJO 83%: Régimen permanente sincronizado sin textos redundantes */
+        /* CRONOGRAMA FIJO 83% REVISADO: Se eliminaron los estados vacíos erróneos */
         const cronogramaDias = [
-            { dia: "Día 1", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 2", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 1", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 2", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
             { dia: "Día 3", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             { dia: "Día 4", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
@@ -164,8 +164,8 @@
             { dia: "Día 11", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             { dia: "Día 12", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 13", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 14", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 13", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 14", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
             { dia: "Día 15", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             { dia: "Día 16", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
@@ -182,8 +182,8 @@
             { dia: "Día 23", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             { dia: "Día 24", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 25", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 26", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 25", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 26", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
             { dia: "Día 27", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             { dia: "Día 28", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
