@@ -57,7 +57,6 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             
-            <!-- CONTROLES Y MÉTRICAS -->
             <div class="lg:col-span-7 space-y-5">
                 
                 <div class="grid grid-cols-3 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
@@ -84,7 +83,6 @@
                         <span id="contador-dias" class="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-200">Día 1</span>
                     </div>
 
-                    <!-- BOTONERA DE CONTROL HISTÓRICO -->
                     <div class="grid grid-cols-12 gap-2 mb-4">
                         <button onclick="retrocederDia()" class="col-span-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-2 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer text-xs tracking-wide border border-slate-200/60">
                             <span>◀</span> Volver
@@ -100,13 +98,11 @@
                     <div class="p-4 bg-slate-50 rounded-xl border border-slate-200/60 relative overflow-hidden">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-600"></div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm" id="datos-operacion">
-                            <!-- Inyectado por JS -->
-                        </div>
+                            </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ANILLO VISUAL DE CÁMARAS -->
             <div class="lg:col-span-5 flex flex-col items-center bg-white border border-slate-200 p-4 md:p-6 rounded-2xl shadow-sm">
                 
                 <div class="clock-container my-4 bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner">
@@ -122,7 +118,6 @@
                     <div id="reloj-camaras" class="absolute inset-0 w-full h-full"></div>
                 </div>
 
-                <!-- REFERENCIAS -->
                 <div class="w-full grid grid-cols-2 gap-2 mt-2 pt-4 border-t border-slate-100 text-[10px] md:text-[11px] font-semibold text-slate-500">
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/60">
                         <div class="w-2.5 h-2.5 bg-white border border-slate-300 rounded"></div>
@@ -149,52 +144,52 @@
         const camarasConfig = [6, 7, 8, 9, 10, 11];
         let diaActual = 0;
 
-        /* CRONOGRAMA DIRECTO: Flujos reales de Llenado y Vaciado */
+        /* CRONOGRAMA CORREGIDO: Flujos reales sincrónicos de Llenado y Vaciado paralelos */
         const cronogramaDias = [
-            { dia: "Día 1", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", camaraDisponible: "Cámara 7", diasInterplanta: 1, balance: "Llenado en Cámara 6 y vaciado en Cámara 11 de forma simultánea." },
-            { dia: "Día 2", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", camaraDisponible: "Cámara 7", diasInterplanta: 2, balance: "Continuación de llenado en Cámara 6 y vaciado en Cámara 11." },
+            { dia: "Día 1", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", diasInterplanta: 1, balance: "Llenado en Cámara 6 y vaciado en Cámara 11 de forma simultánea." },
+            { dia: "Día 2", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", diasInterplanta: 2, balance: "Continuación de llenado en Cámara 6 y vaciado en Cámara 11." },
             
-            { dia: "Día 3", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", camaraDisponible: "Cámara 7", diasInterplanta: 3, balance: "Llenado en Cámara 11 y vaciado en Cámara 10 de forma simultánea." },
-            { dia: "Día 4", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", camaraDisponible: "Cámara 7", diasInterplanta: 4, balance: "Continuación de llenado en Cámara 11 y vaciado en Cámara 10." },
+            { dia: "Día 3", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", diasInterplanta: 3, balance: "Llenado en Cámara 11 y vaciado en Cámara 10 de forma simultánea." },
+            { dia: "Día 4", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", diasInterplanta: 4, balance: "Continuación de llenado en Cámara 11 y vaciado en Cámara 10." },
             
-            { dia: "Día 5", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", camaraDisponible: "Cámara 7", diasInterplanta: 5, balance: "Llenado en Cámara 10 y vaciado en Cámara 9 de forma simultánea." },
-            { dia: "Día 6", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", camaraDisponible: "Cámara 7", diasInterplanta: 6, balance: "Continuación de llenado en Cámara 10 y vaciado en Cámara 9." },
+            { dia: "Día 5", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", diasInterplanta: 5, balance: "Llenado en Cámara 10 y vaciado en Cámara 9 de forma simultánea." },
+            { dia: "Día 6", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", diasInterplanta: 6, balance: "Continuación de llenado en Cámara 10 y vaciado en Cámara 9." },
             
-            { dia: "Día 7", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", camaraDisponible: "Cámara 7", diasInterplanta: 7, balance: "Llenado en Cámara 9 y vaciado en Cámara 8 de forma simultánea." },
-            { dia: "Día 8", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", camaraDisponible: "Cámara 7", diasInterplanta: 8, balance: "Continuación de llenado en Cámara 9 y vaciado en Cámara 8." },
+            { dia: "Día 7", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", diasInterplanta: 7, balance: "Llenado en Cámara 9 y vaciado en Cámara 8 de forma simultánea." },
+            { dia: "Día 8", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", diasInterplanta: 8, balance: "Continuación de llenado en Cámara 9 y vaciado en Cámara 8." },
             
-            { dia: "Día 9", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", camaraDisponible: "Cámara 7", diasInterplanta: 9, balance: "Llenado en Cámara 8 y vaciado en Cámara 7 de forma simultánea." },
-            { dia: "Día 10", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", camaraDisponible: "Cámara 7", diasInterplanta: 10, balance: "Continuación de llenado en Cámara 8 y vaciado en Cámara 7." },
+            { dia: "Día 9", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", diasInterplanta: 9, balance: "Llenado en Cámara 8 y vaciado en Cámara 7 de forma simultánea." },
+            { dia: "Día 10", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", diasInterplanta: 10, balance: "Continuación de llenado en Cámara 8 y vaciado en Cámara 7." },
             
-            { dia: "Día 11", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", camaraDisponible: "Cámara 6", diasInterplanta: 11, balance: "Llenado en Cámara 7 y vaciado en Cámara 6 de forma simultánea." },
-            { dia: "Día 12", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", camaraDisponible: "Cámara 6", diasInterplanta: 12, balance: "Continuación de llenado en Cámara 7 y vaciado en Cámara 6." },
+            { dia: "Día 11", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", diasInterplanta: 11, balance: "Llenado en Cámara 7 y vaciado en Cámara 6 de forma simultánea." },
+            { dia: "Día 12", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", diasInterplanta: 12, balance: "Continuación de llenado en Cámara 7 y vaciado en Cámara 6." },
             
-            { dia: "Día 13", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", camaraDisponible: "Cámara 11", diasInterplanta: 13, balance: "Llenado en Cámara 6 y vaciado en Cámara 11 de forma simultánea." },
-            { dia: "Día 14", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", camaraDisponible: "Cámara 11", diasInterplanta: 14, balance: "Continuación de llenado en Cámara 6 y vaciado en Cámara 11." },
+            { dia: "Día 13", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", diasInterplanta: 13, balance: "Llenado en Cámara 6 y vaciado en Cámara 11 de forma simultánea." },
+            { dia: "Día 14", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", diasInterplanta: 14, balance: "Continuación de llenado en Cámara 6 y vaciado en Cámara 11." },
             
-            { dia: "Día 15", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", camaraDisponible: "Cámara 10", diasInterplanta: 15, balance: "Llenado en Cámara 11 y vaciado en Cámara 10 de forma simultánea." },
-            { dia: "Día 16", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", camaraDisponible: "Cámara 10", diasInterplanta: 16, balance: "Continuación de llenado en Cámara 11 y vaciado en Cámara 10." },
+            { dia: "Día 15", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", diasInterplanta: 15, balance: "Llenado en Cámara 11 y vaciado en Cámara 10 de forma simultánea." },
+            { dia: "Día 16", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", diasInterplanta: 16, balance: "Continuación de llenado en Cámara 11 y vaciado en Cámara 10." },
             
-            { dia: "Día 17", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", camaraDisponible: "Cámara 9", diasInterplanta: 17, balance: "Llenado en Cámara 10 y vaciado en Cámara 9 de forma simultánea." },
-            { dia: "Día 18", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", camaraDisponible: "Cámara 9", diasInterplanta: 18, balance: "Continuación de llenado en Cámara 10 y vaciado en Cámara 9." },
+            { dia: "Día 17", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", diasInterplanta: 17, balance: "Llenado en Cámara 10 y vaciado en Cámara 9 de forma simultánea." },
+            { dia: "Día 18", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", diasInterplanta: 18, balance: "Continuación de llenado en Cámara 10 y vaciado en Cámara 9." },
             
-            { dia: "Día 19", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", camaraDisponible: "Cámara 8", diasInterplanta: 19, balance: "Llenado en Cámara 9 y vaciado en Cámara 8 de forma simultánea." },
-            { dia: "Día 20", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", camaraDisponible: "Cámara 8", diasInterplanta: 20, balance: "Continuación de llenado en Cámara 9 y vaciado en Cámara 8." },
+            { dia: "Día 19", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", diasInterplanta: 19, balance: "Llenado en Cámara 9 y vaciado en Cámara 8 de forma simultánea." },
+            { dia: "Día 20", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", diasInterplanta: 20, balance: "Continuación de llenado en Cámara 9 y vaciado en Cámara 8." },
             
-            { dia: "Día 21", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", camaraDisponible: "Cámara 7", diasInterplanta: 21, balance: "Llenado en Cámara 8 y vaciado en Cámara 7 de forma simultánea." },
-            { dia: "Día 22", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", camaraDisponible: "Cámara 7", diasInterplanta: 22, balance: "Continuación de llenado en Cámara 8 y vaciado en Cámara 7." },
+            { dia: "Día 21", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", diasInterplanta: 21, balance: "Llenado en Cámara 8 y vaciado en Cámara 7 de forma simultánea." },
+            { dia: "Día 22", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", diasInterplanta: 22, balance: "Continuación de llenado en Cámara 8 y vaciado en Cámara 7." },
             
-            { dia: "Día 23", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", camaraDisponible: "Cámara 6", diasInterplanta: 23, balance: "Llenado en Cámara 7 y vaciado en Cámara 6 de forma simultánea." },
-            { dia: "Día 24", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", camaraDisponible: "Cámara 6", diasInterplanta: 24, balance: "Continuación de llenado en Cámara 7 y vaciado en Cámara 6." },
+            { dia: "Día 23", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", diasInterplanta: 23, balance: "Llenado en Cámara 7 y vaciado en Cámara 6 de forma simultánea." },
+            { dia: "Día 24", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", diasInterplanta: 24, balance: "Continuación de llenado en Cámara 7 y vaciado en Cámara 6." },
             
-            { dia: "Día 25", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", camaraDisponible: "Cámara 11", diasInterplanta: 25, balance: "Llenado en Cámara 6 y vaciado en Cámara 11 de forma simultánea." },
-            { dia: "Día 26", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", camaraDisponible: "Cámara 11", diasInterplanta: 26, balance: "Continuación de llenado en Cámara 6 y vaciado en Cámara 11." },
+            { dia: "Día 25", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", diasInterplanta: 25, balance: "Llenado en Cámara 6 y vaciado en Cámara 11 de forma simultánea." },
+            { dia: "Día 26", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", diasInterplanta: 26, balance: "Continuación de llenado en Cámara 6 y vaciado en Cámara 11." },
             
-            { dia: "Día 27", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", camaraDisponible: "Cámara 10", diasInterplanta: 27, balance: "Llenado en Cámara 11 y vaciado en Cámara 10 de forma simultánea." },
-            { dia: "Día 28", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", camaraDisponible: "Cámara 10", diasInterplanta: 28, balance: "Continuación de llenado en Cámara 11 y vaciado en Cámara 10." },
+            { dia: "Día 27", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", diasInterplanta: 27, balance: "Llenado en Cámara 11 y vaciado en Cámara 10 de forma simultánea." },
+            { dia: "Día 28", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", diasInterplanta: 28, balance: "Continuación de llenado en Cámara 11 y vaciado en Cámara 10." },
             
-            { dia: "Día 29", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", camaraDisponible: "Cámara 9", diasInterplanta: 29, balance: "Llenado en Cámara 10 y vaciado en Cámara 9 de forma simultánea." },
-            { dia: "Día 30", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", camaraDisponible: "Cámara 9", diasInterplanta: 30, balance: "Cierre mensual con balance de masa equilibrado en todas las posiciones." }
+            { dia: "Día 29", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", diasInterplanta: 29, balance: "Llenado en Cámara 10 y vaciado en Cámara 9 de forma simultánea." },
+            { dia: "Día 30", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", diasInterplanta: 30, balance: "Cierre mensual con balance de masa equilibrado en todas las posiciones." }
         ];
 
         function renderizarReloj() {
@@ -242,7 +237,7 @@
 
         function actualizarMetricas(datos) {
             document.getElementById('kpi-ocupacion').innerText = `83%`;
-            document.getElementById('kpi-libres').innerText = `1`; // Cambiado a número fijo de cámaras libres
+            document.getElementById('kpi-libres').innerText = `1`;
             document.getElementById('kpi-contador-despachos').innerText = datos.diasInterplanta;
             document.getElementById('contador-dias').innerText = datos.dia;
 
@@ -258,7 +253,7 @@
                 </div>
                 <div class="col-span-1 sm:col-span-2 pt-2 border-t border-slate-200 mt-1">
                     <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Estado de Ocupación Dinámica:</span>
-                    <span class="text-xs md:text-sm font-medium text-slate-600">${datos.balance} (Espacio libre transitorio en ${datos.camaraDisponible})</span>
+                    <span class="text-xs md:text-sm font-medium text-slate-600">${datos.balance}</span>
                 </div>
             `;
         }
