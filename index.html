@@ -144,52 +144,52 @@
         const camarasConfig = [6, 7, 8, 9, 10, 11];
         let diaActual = 0;
 
-        /* CRONOGRAMA DINÁMICO REVISADO: Variación real de ocupación y balances de masa netos */
+        /* CRONOGRAMA FIJO 83%: Régimen permanente sincronizado sin textos redundantes */
         const cronogramaDias = [
-            { dia: "Día 1", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", ocupacion: "83%", disponibles: "1", balance: "Acumulación neta por ritmo de producción superior a la velocidad de evacuación interplanta." },
-            { dia: "Día 2", estados: ['llena', 'vacía', 'llena', 'llena', 'llena', 'vacía'], ingreso: "Ninguno (Cambio de lote)", despacho: "Ninguno", ocupacion: "66%", disponibles: "2", balance: "Liberación de espacio efectiva. Capacidad disponible en Cámaras 7 y 11." },
+            { dia: "Día 1", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 2", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 3", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", ocupacion: "83%", disponibles: "1", balance: "Equilibrio dinámico de masa. El volumen de ingreso iguala al volumen despachado." },
-            { dia: "Día 4", estados: ['llena', 'llena', 'llena', 'llena', 'vacía', 'llena'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "83%", disponibles: "1", balance: "Cámara 10 completamente liberada por interplanta. Stock en reposo térmico." },
+            { dia: "Día 3", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 4", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 5", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", ocupacion: "83%", disponibles: "1", balance: "Ingreso activo desde línea de empaque. Despacho interplanta según programa FIFO." },
-            { dia: "Día 6", estados: ['llena', 'llena', 'llena', 'vacía', 'llena', 'llena'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "83%", disponibles: "1", balance: "Fase de stock retenido estable. Cámara 9 disponible para el próximo ciclo." },
+            { dia: "Día 5", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 6", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 7", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", ocupacion: "83%", disponibles: "1", balance: "Presión por alta producción. Tránsito simultáneo para mantener pulmón operativo." },
-            { dia: "Día 8", estados: ['llena', 'llena', 'vacía', 'llena', 'llena', 'llena'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "83%", disponibles: "1", balance: "Cámara 8 vaciada por completo. Rotación de lotes sin desviaciones." },
+            { dia: "Día 7", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 8", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 9", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", ocupacion: "83%", disponibles: "1", balance: "Aumento de ritmo en despacho interplanta para coordinar con la recepción de Planta B." },
-            { dia: "Día 10", estados: ['llena', 'vacía', 'llena', 'llena', 'llena', 'llena'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "83%", disponibles: "1", balance: "Cámara 7 disponible. El balance de masa se mantiene en los parámetros objetivos." },
+            { dia: "Día 9", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 10", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 11", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", ocupacion: "83%", disponibles: "1", balance: "Ciclo inverso del anillo. Apertura de Cámara 6 para evacuación de stock antiguo." },
-            { dia: "Día 12", estados: ['vacía', 'llena', 'llena', 'llena', 'llena', 'llena'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "83%", disponibles: "1", balance: "Cierre de la primera vuelta del flujo. Capacidad remanente segura." },
+            { dia: "Día 11", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 12", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 13", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", ocupacion: "83%", disponibles: "1", balance: "Reinicio del patrón de flujo paralelo por necesidades logísticas estacionales." },
-            { dia: "Día 14", estados: ['llena', 'vacía', 'llena', 'llena', 'llena', 'vacía'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "66%", disponibles: "2", balance: "Desceleración temporal de producción. Mayor margen de maniobra en almacenamiento." },
+            { dia: "Día 13", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 14", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 15", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", ocupacion: "83%", disponibles: "1", balance: "Retorno al régimen de alta densidad. Sincronización de transportes activa." },
-            { dia: "Día 16", estados: ['llena', 'llena', 'llena', 'llena', 'vacía', 'llena'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "83%", disponibles: "1", balance: "Cámara 10 liberada. Control estricto de tiempos de residencia térmica." },
+            { dia: "Día 15", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 16", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 17", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", ocupacion: "83%", disponibles: "1", balance: "Flujo continuo antihorario. Descarga de lotes con prioridad FIFO." },
-            { dia: "Día 18", estados: ['llena', 'llena', 'llena', 'vacía', 'llena', 'llena'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "83%", disponibles: "1", balance: "Estabilidad del volumen guardado. Cámara 9 lista para operación." },
+            { dia: "Día 17", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 18", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 19", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", ocupacion: "83%", disponibles: "1", balance: "Pico transitorio de carga de empaque amortiguado por el pulmón de frío." },
-            { dia: "Día 20", estados: ['llena', 'llena', 'vacía', 'llena', 'llena', 'llena'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "83%", disponibles: "1", balance: "Evacuación completa de Cámara 8 hacia pulmón interplanta." },
+            { dia: "Día 19", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 20", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 21", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", ocupacion: "83%", disponibles: "1", balance: "Operación de transbordo en andenes coordinada con el movimiento de frío." },
-            { dia: "Día 22", estados: ['llena', 'vacía', 'llena', 'llena', 'llena', 'llena'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "83%", disponibles: "1", balance: "Cámara 7 disponible. Proceso estabilizado sin cuellos de botella." },
+            { dia: "Día 21", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 22", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 23", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", ocupacion: "83%", disponibles: "1", balance: "Traspaso de lotes técnicos controlado por sistema de gestión de almacén." },
-            { dia: "Día 24", estados: ['vacía', 'llena', 'llena', 'llena', 'llena', 'llena'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "83%", disponibles: "1", balance: "Liberación de Cámara 6. Nivel de servicio logístico interno al cien por ciento." },
+            { dia: "Día 23", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 24", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 25", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", ocupacion: "83%", disponibles: "1", balance: "Llenado de lote fresco en paralelo con despacho estratégico a destino final." },
-            { dia: "Día 26", estados: ['llena', 'vacía', 'llena', 'llena', 'llena', 'vacía'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "66%", disponibles: "2", balance: "Quiebre positivo de stock por alta tasa de despacho interplanta." },
+            { dia: "Día 25", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 26", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 27", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", ocupacion: "83%", disponibles: "1", balance: "Ocupación balanceada según programa diario de producción de la industria." },
-            { dia: "Día 28", estados: ['llena', 'llena', 'llena', 'llena', 'vacía', 'llena'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "83%", disponibles: "1", balance: "Cámara 10 libre. Cumplimiento estricto de las ventanas operativas de despacho." },
+            { dia: "Día 27", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 28", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
             
-            { dia: "Día 29", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", ocupacion: "83%", disponibles: "1", balance: "Fase final del ciclo analítico mensual con niveles de stock controlados." },
-            { dia: "Día 30", estados: ['llena', 'llena', 'llena', 'vacía', 'llena', 'llena'], ingreso: "Ninguno", despacho: "Ninguno", ocupacion: "83%", disponibles: "1", balance: "Cierre mensual con balance de masa equilibrado en todas las posiciones." }
+            { dia: "Día 29", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 30", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Corte de balance de masa equilibrado en todas las posiciones." }
         ];
 
         function renderizarReloj() {
@@ -236,9 +236,9 @@
         }
 
         function actualizarMetricas(datos) {
-            document.getElementById('kpi-ocupacion').innerText = datos.ocupacion;
-            document.getElementById('kpi-libres').innerText = datos.disponibles;
-            document.getElementById('kpi-contador-despachos').innerText = (diaActual + 1); // Acumulador real de días transcurridos
+            document.getElementById('kpi-ocupacion').innerText = `83%`;
+            document.getElementById('kpi-libres').innerText = `1`;
+            document.getElementById('kpi-contador-despachos').innerText = (diaActual + 1);
             document.getElementById('contador-dias').innerText = datos.dia;
 
             const contenedorDatos = document.getElementById('datos-operacion');
@@ -252,7 +252,7 @@
                     <span class="text-xs md:text-sm font-bold text-slate-800">${datos.despacho}</span>
                 </div>
                 <div class="col-span-1 sm:col-span-2 pt-2 border-t border-slate-200 mt-1">
-                    <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Análisis de Balance Mensual:</span>
+                    <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Estado de Ocupación Dinámica:</span>
                     <span class="text-xs md:text-sm font-medium text-slate-600">${datos.balance}</span>
                 </div>
             `;
