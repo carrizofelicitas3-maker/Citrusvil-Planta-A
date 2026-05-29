@@ -45,87 +45,76 @@
 
     <div class="max-w-6xl mx-auto p-4 md:p-8">
         
-        <header class="border-b border-slate-200 pb-5 mb-6">
+        <header class="border-b border-slate-200 pb-4 mb-6">
             <div class="flex items-baseline gap-3">
                 <span class="text-2xl md:text-3xl font-black text-emerald-700 tracking-wider">CITRUSVIL</span>
                 <span class="text-lg md:text-xl font-bold text-slate-400 tracking-wide">| PLANTA A</span>
             </div>
-            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 mt-2 tracking-tight">
+            <h1 class="text-lg md:text-xl font-extrabold text-slate-900 mt-1 tracking-tight">
                 Dinámica de almacenamiento en cámaras de frío
             </h1>
         </header>
 
-        <!-- CONFIGURACIÓN DE ESCENARIOS OPERATIVOS -->
-        <div class="mb-6 bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Configuración de Cámaras Disponibles</h3>
-                <p class="text-xs text-slate-500 mt-0.5">Simulación del comportamiento del flujo continuo según el margen de maniobra.</p>
-            </div>
-            <div class="flex gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200/60 self-start sm:self-center">
-                <button id="btn-modo-real" onclick="cambiarModo('real')" class="px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40">
-                    1 Cámara
-                </button>
-                <button id="btn-modo-ideal" onclick="cambiarModo('ideal')" class="px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50">
-                    2 Cámaras
-                </button>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             
-            <!-- CONTROLES Y MÉTRICAS -->
-            <div class="lg:col-span-7 space-y-5">
+            <div class="lg:col-span-6 space-y-4">
                 
+                <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+                    
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4 pb-4 border-b border-slate-100">
+                        <div class="p-1 bg-slate-100 rounded-lg border border-slate-200/60 w-full sm:w-auto flex flex-row">
+                            <button id="btn-modo-real" onclick="cambiarModo('real')" class="px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40 whitespace-nowrap">
+                                1 Cámara (Real)
+                            </button>
+                            <button id="btn-modo-ideal" onclick="cambiarModo('ideal')" class="px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50 whitespace-nowrap">
+                                2 Cámaras (Ideal)
+                            </button>
+                        </div>
+                        
+                        <span id="contador-dias" class="text-xs font-extrabold bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full border border-indigo-100 self-stretch sm:self-auto text-center">
+                            Paso 1
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-12 gap-2 mb-4">
+                        <button onclick="retrocederDia()" class="col-span-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 rounded-lg transition flex items-center justify-center gap-1 cursor-pointer text-xs border border-slate-200/60">
+                            ◀ Volver
+                        </button>
+                        <button id="btn-siguiente" onclick="avanzarDia()" class="col-span-6 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 rounded-lg transition shadow-md shadow-indigo-600/10 flex items-center justify-center gap-2 cursor-pointer text-xs md:text-sm tracking-wide">
+                            Avanzar Paso ▶
+                        </button>
+                        <button onclick="reiniciarSimulacion()" class="col-span-3 bg-slate-50 hover:bg-slate-100 text-slate-400 font-bold py-2.5 rounded-lg transition cursor-pointer text-xs border border-slate-200/40">
+                            ⟳
+                        </button>
+                    </div>
+
+                    <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/60 relative overflow-hidden">
+                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-600"></div>
+                        <div class="grid grid-cols-2 gap-4 text-xs md:text-sm" id="datos-operacion">
+                            </div>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-3 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                     <div class="text-center border-r border-slate-100">
                         <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Ocupación Actual</span>
                         <span id="kpi-ocupacion" class="text-lg md:text-2xl font-black text-indigo-600">16%</span>
                     </div>
                     <div class="text-center border-r border-slate-100">
-                        <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Cámaras Libres Total</span>
+                        <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Cámaras Libres</span>
                         <span id="kpi-libres" class="text-lg md:text-2xl font-black text-slate-700">5</span>
                     </div>
                     <div class="text-center px-1">
-                        <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Ciclos Completos</span>
+                        <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Ciclos FIFO</span>
                         <span id="kpi-contador-despachos" class="text-lg md:text-2xl font-black text-emerald-600">0</span>
                     </div>
                 </div>
-
-                <div class="bg-white border border-slate-200 rounded-2xl p-4 md:p-6 shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
-                            Simulación de Capacidad Mensual Sincronizada
-                        </h2>
-                        <span id="contador-dias" class="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-200">Paso 1</span>
-                    </div>
-
-                    <!-- BOTONERA DE CONTROL HISTÓRICO -->
-                    <div class="grid grid-cols-12 gap-2 mb-4">
-                        <button onclick="retrocederDia()" class="col-span-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-2 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer text-xs tracking-wide border border-slate-200/60">
-                            <span>◀</span> Volver
-                        </button>
-                        <button id="btn-siguiente" onclick="avanzarDia()" class="col-span-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-md shadow-indigo-600/10 flex items-center justify-center gap-2 cursor-pointer text-xs md:text-sm tracking-wide">
-                            Avanzar <span>▶</span>
-                        </button>
-                        <button onclick="reiniciarSimulacion()" class="col-span-3 bg-slate-50 hover:bg-slate-100 text-slate-500 font-medium py-3 px-2 rounded-xl transition cursor-pointer text-xs border border-slate-200/40">
-                            Reiniciar
-                        </button>
-                    </div>
-
-                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-200/60 relative overflow-hidden">
-                        <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-600"></div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm" id="datos-operacion">
-                            <!-- Inyectado por JS -->
-                        </div>
-                    </div>
-                </div>
+                
             </div>
 
-            <!-- ANILLO VISUAL DE CÁMARAS -->
-            <div class="lg:col-span-5 flex flex-col items-center bg-white border border-slate-200 p-4 md:p-6 rounded-2xl shadow-sm">
+            <div class="lg:col-span-6 flex flex-col items-center bg-white border border-slate-200 p-4 md:p-6 rounded-xl shadow-sm">
                 
-                <div class="clock-container my-4 bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner">
+                <div class="clock-container my-2 bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner">
                     
                     <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-white border border-slate-200 flex flex-col items-center justify-center text-center p-2 z-10 shadow-sm">
                         <span class="text-[8px] sm:text-[9px] text-slate-400 font-bold tracking-widest">INGRESO</span>
@@ -138,8 +127,7 @@
                     <div id="reloj-camaras" class="absolute inset-0 w-full h-full"></div>
                 </div>
 
-                <!-- REFERENCIAS -->
-                <div class="w-full grid grid-cols-2 gap-2 mt-2 pt-4 border-t border-slate-100 text-[10px] md:text-[11px] font-semibold text-slate-500">
+                <div class="w-full grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 text-[10px] md:text-[11px] font-semibold text-slate-500">
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/60">
                         <div class="w-2.5 h-2.5 bg-white border border-dashed border-slate-300 rounded"></div>
                         <span>Vacía (Disponible)</span>
@@ -167,25 +155,25 @@
         let modoActual = 'real';
 
         const cronogramaReal = [
-            { paso: "Paso 1", estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 6", despacho: "Ninguno (Sin Stock)", ciclo: 0, ocupacion: "16%", libres: "5", obs: "Puesta en marcha: El bloque arranca totalmente vacío. Inicia el ingreso de producción exclusivamente en la Cámara 6." },
-            { paso: "Paso 2", estados: ['llena', 'llenando', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 7", despacho: "Ninguno (Acumulando)", ciclo: 0, ocupacion: "33%", libres: "4", obs: "Acumulación: Se consolidó el stock en la Cámara 6. El flujo avanza en sentido horario hacia la Cámara 7." },
-            { paso: "Paso 3", estados: ['llena', 'llena', 'llenando', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 8", despacho: "Ninguno (Acumulando)", ciclo: 0, ocupacion: "50%", libres: "3", obs: "Llenado medio: Las cámaras 6 y 7 se encuentran llenas de resguardo. El ingreso pasa activamente a ocupar la Cámara 8." },
-            { paso: "Paso 4", estados: ['llena', 'llena', 'llena', 'llenando', 'vacía', 'vacía'], ingreso: "Cámara 9", despacho: "Ninguno (Acumulando)", ciclo: 0, ocupacion: "66%", libres: "2", obs: "Presión en alza: Tres celdas del bloque ya contienen stock guardado. La producción diaria se deriva a la Cámara 9." },
-            { paso: "Paso 5", estados: ['llena', 'llena', 'llena', 'llena', 'llenando', 'vacía'], ingreso: "Cámara 10", despacho: "Ninguno (Último pulmón)", ciclo: 0, ocupacion: "83%", libres: "1", obs: "Capacidad crítica: El anillo alcanza su nivel real de saturación. Se está llenando la Cámara 10; solo queda una celda limpia." },
-            { paso: "Paso 6", estados: ['vaciando', 'llena', 'llena', 'llena', 'llena', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 6", ciclo: 0, ocupacion: "83%", libres: "1", obs: "Sincronismo FIFO Crítico: Al iniciar el llenado de la última celda (C11), la Cámara 6 (la más antigua) se abre obligatoriamente para tránsito interplanta para evitar el colapso del buffer." },
-            { paso: "Paso 7", estados: ['llenando', 'vaciando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 6", despacho: "Cámara 7", ciclo: 1, ocupacion: "83%", libres: "1", obs: "Régimen Permanente - Vuelta 2: La Cámara 6 se vació y vuelve a recibir el caudal, obligando a la Cámara 7 a iniciar su despacho." },
-            { paso: "Paso 8", estados: ['llena', 'llenando', 'vaciando', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 8", ciclo: 1, ocupacion: "83%", libres: "1", obs: "Giro continuo: El ingreso progresa a la Cámara 7 liberando espacio físico mediante la evacuación de la Cámara 8." },
-            { paso: "Paso 9", estados: ['llena', 'llena', 'llenando', 'vaciando', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 9", ciclo: 1, ocupacion: "83%", libres: "1", obs: "Estabilizado: La producción se consolida en la 8, mientras que la logística interplanta drena de manera fluida la Cámara 9." }
+            { paso: "Paso 1", estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 6", despacho: "Ninguno (Sin Stock)", ciclo: 0, ocupacion: "16%", libres: "5" },
+            { paso: "Paso 2", estados: ['llena', 'llenando', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 7", despacho: "Ninguno (Acumulando)", ciclo: 0, ocupacion: "33%", libres: "4" },
+            { paso: "Paso 3", estados: ['llena', 'llena', 'llenando', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 8", despacho: "Ninguno (Acumulando)", ciclo: 0, ocupacion: "50%", libres: "3" },
+            { paso: "Paso 4", estados: ['llena', 'llena', 'llena', 'llenando', 'vacía', 'vacía'], ingreso: "Cámara 9", despacho: "Ninguno (Acumulando)", ciclo: 0, ocupacion: "66%", libres: "2" },
+            { paso: "Paso 5", estados: ['llena', 'llena', 'llena', 'llena', 'llenando', 'vacía'], ingreso: "Cámara 10", despacho: "Ninguno (Último pulmón)", ciclo: 0, ocupacion: "83%", libres: "1" },
+            { paso: "Paso 6", estados: ['vaciando', 'llena', 'llena', 'llena', 'llena', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 6", ciclo: 0, ocupacion: "83%", libres: "1" },
+            { paso: "Paso 7", estados: ['llenando', 'vaciando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 6", despacho: "Cámara 7", ciclo: 1, ocupacion: "83%", libres: "1" },
+            { paso: "Paso 8", estados: ['llena', 'llenando', 'vaciando', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 8", ciclo: 1, ocupacion: "83%", libres: "1" },
+            { paso: "Paso 9", estados: ['llena', 'llena', 'llenando', 'vaciando', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 9", ciclo: 1, ocupacion: "83%", libres: "1" }
         ];
 
         const cronogramaIdeal = [
-            { paso: "Paso 1", estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 6", despacho: "Ninguno (Inicio)", ciclo: 0, ocupacion: "16%", libres: "5", obs: "Arranque ideal: Todo el anillo se encuentra desocupado. Inicia el ingreso controlado de los lotes sobre la Cámara 6." },
-            { paso: "Paso 2", estados: ['llena', 'llenando', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 7", despacho: "Ninguno (Acumulando)", ciclo: 0, ocupacion: "33%", libres: "4", obs: "Seguridad operativa: Se completa la Cámara 6. La producción pasa a la Cámara 7 manteniendo un margen de maniobra amplio." },
-            { paso: "Paso 3", estados: ['llena', 'llena', 'llenando', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 8", despacho: "Ninguno (Acumulando)", ciclo: 0, ocupacion: "50%", libres: "3", obs: "Progreso limpio: Ingreso en la Cámara 8. Tres cámaras vacías actúan como respaldo ante contingencias logísticas." },
-            { paso: "Paso 4", estados: ['llena', 'llena', 'llena', 'llenando', 'vacía', 'vacía'], ingreso: "Cámara 9", despacho: "Ninguno (Límite de Régimen)", ciclo: 0, ocupacion: "66%", libres: "2", obs: "Techo operativo alcanzado: Se llena la Cámara 9. Al próximo paso se disparará el flujo interplanta preventivo." },
-            { paso: "Paso 5", estados: ['vaciando', 'llena', 'llena', 'llena', 'llenando', 'vacía'], ingreso: "Cámara 10", despacho: "Cámara 6", ciclo: 1, ocupacion: "66%", libres: "2", obs: "Régimen Ideal Estable: Ingreso en Cámara 10 mientras la Cámara 6 drena con holgura. Quedan siempre 2 disponibles de colchón." },
-            { paso: "Paso 6", estados: ['vacía', 'vaciando', 'llena', 'llena', 'llena', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 7", ciclo: 1, ocupacion: "66%", libres: "2", obs: "Rotación segura: La entrada rota a la 11, la 6 queda 100% vacía y limpia, y se inicia la extracción de la Cámara 7." },
-            { paso: "Paso 7", estados: ['llenando', 'vacía', 'vaciando', 'llena', 'llena', 'llena'], ingreso: "Cámara 6", despacho: "Cámara 8", ciclo: 1, ocupacion: "66%", libres: "2", obs: "Segundo ciclo ideal: El ingreso vuelve a la Cámara 6 original, preservando la 7 como amortiguador y evacuando la 8." }
+            { paso: "Paso 1", estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 6", despacho: "Ninguno (Inicio)", ciclo: 0, ocupacion: "16%", libres: "5" },
+            { paso: "Paso 2", estados: ['llena', 'llenando', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 7", despacho: "Ninguno (Acumulando)", ciclo: 0, ocupacion: "33%", libres: "4" },
+            { paso: "Paso 3", estados: ['llena', 'llena', 'llenando', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 8", despacho: "Ninguno (Acumulando)", ciclo: 0, ocupacion: "50%", libres: "3" },
+            { paso: "Paso 4", estados: ['llena', 'llena', 'llena', 'llenando', 'vacía', 'vacía'], ingreso: "Cámara 9", despacho: "Ninguno (Límite de Régimen)", ciclo: 0, ocupacion: "66%", libres: "2" },
+            { paso: "Paso 5", estados: ['vaciando', 'llena', 'llena', 'llena', 'llenando', 'vacía'], ingreso: "Cámara 10", despacho: "Cámara 6", ciclo: 1, ocupacion: "66%", libres: "2" },
+            { paso: "Paso 6", estados: ['vacía', 'vaciando', 'llena', 'llena', 'llena', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 7", ciclo: 1, ocupacion: "66%", libres: "2" },
+            { paso: "Paso 7", estados: ['llenando', 'vacía', 'vaciando', 'llena', 'llena', 'llena'], ingreso: "Cámara 6", despacho: "Cámara 8", ciclo: 1, ocupacion: "66%", libres: "2" }
         ];
 
         function getCronograma() {
@@ -200,11 +188,11 @@
             const btnIdeal = document.getElementById('btn-modo-ideal');
             
             if (modo === 'real') {
-                btnReal.className = "px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40";
-                btnIdeal.className = "px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50";
+                btnReal.className = "px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40 whitespace-nowrap";
+                btnIdeal.className = "px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50 whitespace-nowrap";
             } else {
-                btnIdeal.className = "px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40";
-                btnReal.className = "px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50";
+                btnIdeal.className = "px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40 whitespace-nowrap";
+                btnReal.className = "px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50 whitespace-nowrap";
             }
             
             renderizarReloj();
@@ -267,16 +255,12 @@
             const contenedorDatos = document.getElementById('datos-operacion');
             contenedorDatos.innerHTML = `
                 <div>
-                    <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Flujo de Ingreso (Horario):</span>
-                    <span class="text-xs md:text-sm font-bold text-slate-800">${datos.ingreso}</span>
+                    <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Flujo de Ingreso:</span>
+                    <span class="text-xs md:text-sm font-bold text-slate-800 flex items-center gap-1">🚚 ${datos.ingreso}</span>
                 </div>
                 <div>
-                    <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Tránsito Interplantas (FIFO):</span>
-                    <span class="text-xs md:text-sm font-bold text-slate-800">${datos.despacho}</span>
-                </div>
-                <div class="col-span-1 sm:col-span-2 pt-2 border-t border-slate-200 mt-1">
-                    <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Estado de Ocupación Dinámica:</span>
-                    <span class="text-xs md:text-sm font-medium text-slate-600">${datos.obs}</span>
+                    <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Tránsito Interplantas:</span>
+                    <span class="text-xs md:text-sm font-bold text-slate-800 flex items-center gap-1">🔄 ${datos.despacho}</span>
                 </div>
             `;
         }
