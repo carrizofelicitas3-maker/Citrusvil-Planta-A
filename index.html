@@ -6,7 +6,6 @@
     <title>Citrusvil | Planta A</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* Distribución radial adaptable y exacta - LAYOUT HORARIO */
         .clock-container {
             position: relative;
             width: 290px;
@@ -58,20 +57,25 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             
+            <!-- CONTROLES Y MÉTRICAS -->
             <div class="lg:col-span-7 space-y-5">
                 
-                <div class="grid grid-cols-3 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <div class="grid grid-cols-4 gap-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                     <div class="text-center border-r border-slate-100">
                         <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Ocupación</span>
-                        <span id="kpi-ocupacion" class="text-lg md:text-2xl font-black text-indigo-600">0%</span>
+                        <span id="kpi-ocupacion" class="text-lg md:text-xl font-black text-indigo-600">0%</span>
                     </div>
                     <div class="text-center border-r border-slate-100">
                         <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Cámaras Libres</span>
-                        <span id="kpi-libres" class="text-lg md:text-2xl font-black text-slate-700">6</span>
+                        <span id="kpi-libres" class="text-lg md:text-xl font-black text-slate-700">6</span>
+                    </div>
+                    <div class="text-center border-r border-slate-100 px-1">
+                        <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Despachos Totales</span>
+                        <span id="kpi-contador-despachos" class="text-lg md:text-xl font-black text-emerald-600">0</span>
                     </div>
                     <div class="text-center flex flex-col justify-center items-center px-1">
                         <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Flujo Interplanta</span>
-                        <span id="kpi-interplanta" class="text-[10px] font-bold bg-slate-100 text-slate-400 px-2 py-0.5 rounded mt-1 block tracking-wide truncate w-full max-w-[95px]">STANDBY</span>
+                        <span id="kpi-interplanta" class="text-[10px] font-bold bg-slate-100 text-slate-400 px-2 py-0.5 rounded mt-1 block tracking-wide truncate w-full">STANDBY</span>
                     </div>
                 </div>
 
@@ -84,6 +88,7 @@
                         <span id="contador-dias" class="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-200">Estado Inicial</span>
                     </div>
 
+                    <!-- BOTONERA DE CONTROL HISTÓRICO -->
                     <div class="grid grid-cols-12 gap-2 mb-4">
                         <button onclick="retrocederDia()" class="col-span-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-2 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer text-xs tracking-wide border border-slate-200/60">
                             <span>◀</span> Volver
@@ -107,6 +112,7 @@
                 </div>
             </div>
 
+            <!-- ANILLO VISUAL DE CÁMARAS -->
             <div class="lg:col-span-5 flex flex-col items-center bg-white border border-slate-200 p-4 md:p-6 rounded-2xl shadow-sm">
                 
                 <div class="clock-container my-4 bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner">
@@ -122,6 +128,7 @@
                     <div id="reloj-camaras" class="absolute inset-0 w-full h-full"></div>
                 </div>
 
+                <!-- REFERENCIAS -->
                 <div class="w-full grid grid-cols-2 gap-2 mt-2 pt-4 border-t border-slate-100 text-[10px] md:text-[11px] font-semibold text-slate-500">
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/60">
                         <div class="w-2.5 h-2.5 bg-white border border-slate-300 rounded"></div>
@@ -129,11 +136,11 @@
                     </div>
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/60">
                         <div class="w-2.5 h-2.5 bg-blue-500 animate-pulse rounded"></div>
-                        <span>Ingreso (Llenado - 48h)</span>
+                        <span>Ingreso (Llenado)</span>
                     </div>
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/60">
                         <div class="w-2.5 h-2.5 bg-emerald-600 rounded"></div>
-                        <span>Completa (Stock Retenido)</span>
+                        <span>Completa</span>
                     </div>
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/60">
                         <div class="w-2.5 h-2.5 bg-amber-500 animate-pulse rounded"></div>
@@ -148,56 +155,52 @@
         const camarasConfig = [6, 7, 8, 9, 10, 11];
         let diaActual = 0;
 
-        /* CRONOGRAMA CORREGIDO: Mantener siempre un colchón de 2 cámaras libres (Disponibles) */
+        /* CRONOGRAMA DE ALTA DENSIDAD: 5 Cámaras Ocupadas, 1 Sola Cámara Disponible (Vacía) */
         const cronogramaDias = [
-            { dia: "Estado Inicial", estados: ['vacía', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Ninguno", despacho: "Ninguno", balance: "Infraestructura vacía. 100% de capacidad disponible." },
+            { dia: "Estado Inicial", estados: ['vacía', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Ninguno", despacho: "Ninguno", despachosAcumulados: 0, balance: "Planta vacía al inicio de la temporada." },
             
-            // --- CICLO 1: Llenado secuencial inicial del pulmón ---
-            { dia: "Día 1", estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 6 (24h)", despacho: "Inactivo", balance: "Inicio del frente de producción en Cámara 6." },
-            { dia: "Día 2", estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 6 (48h)", despacho: "Inactivo", balance: "Consolidación de lote técnico en Cámara 6." },
-            { dia: "Día 3", estados: ['llena', 'vacía', 'vacía', 'vacía', 'vacía', 'llenando'], ingreso: "Cámara 11 (24h)", despacho: "Inactivo", balance: "Cámara 6 completa. Rotación antihoraria a Cámara 11." },
-            { dia: "Día 4", estados: ['llena', 'vacía', 'vacía', 'vacía', 'vacía', 'llenando'], ingreso: "Cámara 11 (48h)", despacho: "Inactivo", balance: "Cámara 11 absorbe el ritmo de ingreso de planta." },
-            { dia: "Día 5", estados: ['llena', 'vacía', 'vacía', 'vacía', 'llenando', 'llena'], ingreso: "Cámara 10 (24h)", despacho: "Inactivo", balance: "Cámara 11 completa. Ingreso pasa a Cámara 10." },
-            { dia: "Día 6", estados: ['llena', 'vacía', 'vacía', 'vacía', 'llenando', 'llena'], ingreso: "Cámara 10 (48h)", despacho: "Inactivo", balance: "Nivel de ocupación equilibrado antes del despacho." },
+            // --- FASE DE CARGA INICIAL HASTA LLEGAR AL RÉGIMEN REAL (1 LIBRE) ---
+            { dia: "Día 1", estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 6 (Primer día)", despacho: "Ninguno", despachosAcumulados: 0, balance: "Llenado inicial de Cámara 6." },
+            { dia: "Día 2", estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 6 (Segundo día)", despacho: "Ninguno", despachosAcumulados: 0, balance: "Finaliza llenado de Cámara 6." },
+            { dia: "Día 3", estados: ['llena', 'vacía', 'vacía', 'vacía', 'vacía', 'llenando'], ingreso: "Cámara 11 (Primer día)", despacho: "Ninguno", despachosAcumulados: 0, balance: "Cámara 6 completa. Rotación antihoraria a Cámara 11." },
+            { dia: "Día 4", estados: ['llena', 'vacía', 'vacía', 'vacía', 'vacía', 'llenando'], ingreso: "Cámara 11 (Segundo día)", despacho: "Ninguno", despachosAcumulados: 0, balance: "Finaliza llenado de Cámara 11." },
+            { dia: "Día 5", estados: ['llena', 'vacía', 'vacía', 'vacía', 'llenando', 'llena'], ingreso: "Cámara 10 (Primer día)", despacho: "Ninguno", despachosAcumulados: 0, balance: "Cámara 11 completa. Rotación antihoraria a Cámara 10." },
+            { dia: "Día 6", estados: ['llena', 'vacía', 'vacía', 'vacía', 'llenando', 'llena'], ingreso: "Cámara 10 (Segundo día)", despacho: "Ninguno", despachosAcumulados: 0, balance: "Finaliza llenado de Cámara 10." },
+            { dia: "Día 7", estados: ['llena', 'vacía', 'vacía', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9 (Primer día)", despacho: "Ninguno", despachosAcumulados: 0, balance: "Cámara 10 completa. Rotación antihoraria a Cámara 9." },
+            { dia: "Día 8", estados: ['llena', 'vacía', 'vacía', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9 (Segundo día)", despacho: "Ninguno", despachosAcumulados: 0, balance: "Finaliza llenado de Cámara 9." },
+            { dia: "Día 9", estados: ['llena', 'vacía', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8 (Primer día)", despacho: "Ninguno", despachosAcumulados: 0, balance: "Cámara 9 completa. Rotación antihoraria a Cámara 8." },
+            { dia: "Día 10", estados: ['llena', 'vacía', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8 (Segundo día)", despacho: "Ninguno", despachosAcumulados: 0, balance: "Finaliza llenado de Cámara 8. Queda una sola cámara libre." },
 
-            // --- RECOLO DE RÉGIMEN PERMANENTE (Ciclo cerrado de 6 días, 2 cámaras libres constantes) ---
-            // Sub-ciclo A
-            { dia: "Día 7", estados: ['vaciando', 'vacía', 'vacía', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9 (24h)", despacho: "Cámara 6 (24h)", balance: "<strong>Sincronización FIFO</strong>: Despacho de Cam 6 abre espacio físico." },
-            { dia: "Día 8", estados: ['vaciando', 'vacía', 'vacía', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9 (48h)", despacho: "Cámara 6 (48h)", balance: "Balance de masa perfecto. 2 cámaras disponibles aseguradas." },
-            // Sub-ciclo B
-            { dia: "Día 9", estados: ['vacía', 'vacía', 'llenando', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 8 (24h)", despacho: "Cámara 11 (24h)", balance: "Cámara 6 queda libre. Tracción de despacho pasa a Cámara 11." },
-            { dia: "Día 10", estados: ['vacía', 'vacía', 'llenando', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 8 (48h)", despacho: "Cámara 11 (48h)", balance: "Rotación antihoraria continua. Flujo interplanta estable." },
-            // Sub-ciclo C
-            { dia: "Día 11", estados: ['vacía', 'llenando', 'llena', 'llena', 'vaciando', 'vacía'], ingreso: "Cámara 7 (24h)", despacho: "Cámara 10 (24h)", balance: "Cámara 11 queda libre. Tracción de despacho pasa a Cámara 10." },
-            { dia: "Día 12", estados: ['vacía', 'llenando', 'llena', 'llena', 'vaciando', 'vacía'], ingreso: "Cámara 7 (48h)", despacho: "Cámara 10 (48h)", balance: "Estabilidad del pulmón dinámico con 2 posiciones libres." },
+            // --- INICIO DE RÉGIMEN PERMANENTE EXTREMO (Saturación Controlada: 5 Ocupadas, 1 Libre) ---
+            { dia: "Día 11", estados: ['vaciando', 'vacía', 'llena', 'llena', 'llena', 'llena'], ingreso: "Ninguno (Espera de espacio)", despacho: "Cámara 6 (Primer día)", despachosAcumulados: 0, balance: "Se inicia despacho interplanta de Cámara 6 para abrir espacio." },
+            { dia: "Día 12", estados: ['vaciando', 'vacía', 'llena', 'llena', 'llena', 'llena'], ingreso: "Ninguno (Espera de espacio)", despacho: "Cámara 6 (Segundo día)", despachosAcumulados: 1, balance: "Finaliza despacho de Cámara 6 e inmediatamente se habilita el ingreso." },
             
-            // --- REPETICIÓN EXACTA DEL RÉGIMEN PERMANENTE ---
-            { dia: "Día 13", estados: ['llenando', 'llena', 'llena', 'vaciando', 'vacía', 'vacía'], ingreso: "Cámara 6 (24h)", despacho: "Cámara 9 (24h)", balance: "Cámara 10 queda libre. Despacho pasa a Cámara 9. Re-ingreso a Cam 6." },
-            { dia: "Día 14", estados: ['llenando', 'llena', 'llena', 'vaciando', 'vacía', 'vacía'], ingreso: "Cámara 6 (48h)", despacho: "Cámara 9 (48h)", balance: "Flujo continuo sin acumulación de stock retenido." },
-
-            { dia: "Día 15", estados: ['llena', 'llena', 'vaciando', 'vacía', 'vacía', 'llenando'], ingreso: "Cámara 11 (24h)", despacho: "Cámara 8 (24h)", balance: "Cámara 9 queda libre. Despacho de Cámara 8. Ingreso a Cámara 11." },
-            { dia: "Día 16", estados: ['llena', 'llena', 'vaciando', 'vacía', 'vacía', 'llenando'], ingreso: "Cámara 11 (48h)", despacho: "Cámara 8 (48h)", balance: "Garantía de flujo constante sin paradas de línea." },
-
-            { dia: "Día 17", estados: ['llena', 'vaciando', 'vacía', 'vacía', 'llenando', 'llena'], ingreso: "Cámara 10 (24h)", despacho: "Cámara 7 (24h)", balance: "Cámara 8 queda libre. Despacho de Cámara 7. Ingreso a Cámara 10." },
-            { dia: "Día 18", estados: ['llena', 'vaciando', 'vacía', 'vacía', 'llenando', 'llena'], ingreso: "Cámara 10 (48h)", despacho: "Cámara 7 (48h)", balance: "El inventario rota de manera simétrica en todas las posiciones." },
-
-            { dia: "Día 19", estados: ['vaciando', 'vacía', 'vacía', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9 (24h)", despacho: "Cámara 6 (24h)", balance: "Cámara 7 queda libre. Se repite el patrón del Día 7 de forma exacta." },
-            { dia: "Día 20", estados: ['vaciando', 'vacía', 'vacía', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9 (48h)", despacho: "Cámara 6 (48h)", balance: "Eficiencia de transfers interplanta al 100%." },
-
-            { dia: "Día 21", estados: ['vacía', 'vacía', 'llenando', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 8 (24h)", despacho: "Cámara 11 (24h)", balance: "Cámara 6 queda libre. Despacho de Cámara 11. Ingreso a Cámara 8." },
-            { dia: "Día 22", estados: ['vacía', 'vacía', 'llenando', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 8 (48h)", despacho: "Cámara 11 (48h)", balance: "Trazabilidad FIFO controlada por el algoritmo de planta." },
-
-            { dia: "Día 23", estados: ['vacía', 'llenando', 'llena', 'llena', 'vaciando', 'vacía'], ingreso: "Cámara 7 (24h)", despacho: "Cámara 10 (24h)", balance: "Cámara 11 queda libre. Despacho de Cámara 10. Ingreso a Cámara 7." },
-            { dia: "Día 24", estados: ['vacía', 'llenando', 'llena', 'llena', 'vaciando', 'vacía'], ingreso: "Cámara 7 (48h)", despacho: "Cámara 10 (48h)", balance: "Sincronización mensual sin desviaciones en el balance de masa." },
-
-            { dia: "Día 25", estados: ['llenando', 'llena', 'llena', 'vaciando', 'vacía', 'vacía'], ingreso: "Cámara 6 (24h)", despacho: "Cámara 9 (24h)", balance: "Cámara 10 libre. Despacho de Cámara 9. Ingreso a Cámara 6." },
-            { dia: "Día 26", estados: ['llenando', 'llena', 'llena', 'vaciando', 'vacía', 'vacía'], ingreso: "Cámara 6 (48h)", despacho: "Cámara 9 (48h)", balance: "El colchón de 2 cámaras disponibles absorbe imprevistos." },
-
-            { dia: "Día 27", estados: ['llena', 'llena', 'vaciando', 'vacía', 'vacía', 'llenando'], ingreso: "Cámara 11 (24h)", despacho: "Cámara 8 (24h)", balance: "Cámara 9 libre. Despacho de Cámara 8. Ingreso a Cámara 11." },
-            { dia: "Día 28", estados: ['llena', 'llena', 'vaciando', 'vacía', 'vacía', 'llenando'], ingreso: "Cámara 11 (48h)", despacho: "Cámara 8 (48h)", balance: "Coordinación logística optimizada de fin de mes." },
-
-            { dia: "Día 29", estados: ['llena', 'vaciando', 'vacía', 'vacía', 'llenando', 'llena'], ingreso: "Cámara 10 (24h)", despacho: "Cámara 7 (24h)", balance: "Cámara 8 libre. Despacho de Cámara 7. Ingreso a Cámara 10." },
-            { dia: "Día 30", estados: ['llena', 'vaciando', 'vacía', 'vacía', 'llenando', 'llena'], ingreso: "Cámara 10 (48h)", despacho: "Cámara 7 (48h)", balance: "<strong>Cierre de mes exitoso</strong>: Ciclo cerrado continuo y balanceado." }
+            { dia: "Día 13", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 6 (Primer día)", despacho: "Ninguno", despachosAcumulados: 1, balance: "Re-ingreso de fruta en Cámara 6." },
+            { dia: "Día 14", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 6 (Segundo día)", despacho: "Ninguno", despachosAcumulados: 1, balance: "Finaliza llenado de Cámara 6. Se activa tracción sobre el stock más antiguo." },
+            
+            { dia: "Día 15", estados: ['llena', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Ninguno (Espera de espacio)", despacho: "Cámara 11 (Primer día)", despachosAcumulados: 1, balance: "Se inicia despacho interplanta de Cámara 11 por orden secuencial FIFO." },
+            { dia: "Día 16", estados: ['llena', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Ninguno (Espera de espacio)", despacho: "Cámara 11 (Segundo día)", despachosAcumulados: 2, balance: "Finaliza despacho de Cámara 11 y se transfiere la línea de entrada." },
+            
+            { dia: "Día 17", estados: ['llena', 'vacía', 'llena', 'llena', 'llenando', 'vacía'], ingreso: "Cámara 11 (Primer día)", despacho: "Ninguno", despachosAcumulados: 2, balance: "Re-ingreso de fruta en Cámara 11." },
+            { dia: "Día 18", estados: ['llena', 'vacía', 'llena', 'llena', 'llenando', 'vacía'], ingreso: "Cámara 11 (Segundo día)", despacho: "Ninguno", despachosAcumulados: 2, balance: "Finaliza llenado de Cámara 11. Se requiere liberación de la siguiente unidad." },
+            
+            { dia: "Día 19", estados: ['llena', 'vacía', 'llena', 'vaciando', 'llena', 'llena'], ingreso: "Ninguno (Espera de espacio)", despacho: "Cámara 10 (Primer día)", despachosAcumulados: 2, balance: "Se inicia despacho interplanta de Cámara 10 por orden secuencial FIFO." },
+            { dia: "Día 20", estados: ['llena', 'vacía', 'llena', 'vaciando', 'llena', 'llena'], ingreso: "Ninguno (Espera de espacio)", despacho: "Cámara 10 (Segundo día)", despachosAcumulados: 3, balance: "Finaliza despacho de Cámara 10 para dar continuidad al ingreso." },
+            
+            { dia: "Día 21", estados: ['llena', 'vacía', 'llena', 'vacía', 'llena', 'llena'], ingreso: "Cámara 10 (Primer día)", despacho: "Ninguno", despachosAcumulados: 3, balance: "Re-ingreso de fruta en Cámara 10." },
+            { dia: "Día 22", estados: ['llena', 'vacía', 'llena', 'vacía', 'llena', 'llena'], ingreso: "Cámara 10 (Segundo día)", despacho: "Ninguno", despachosAcumulados: 3, balance: "Finaliza llenado de Cámara 10. Movimiento de stock hacia planta de proceso." },
+            
+            { dia: "Día 23", estados: ['llena', 'vacía', 'vaciando', 'llena', 'llena', 'llena'], ingreso: "Ninguno (Espera de espacio)", despacho: "Cámara 9 (Primer día)", despachosAcumulados: 3, balance: "Se inicia despacho interplanta de Cámara 9 por orden secuencial FIFO." },
+            { dia: "Día 24", estados: ['llena', 'vacía', 'vaciando', 'llena', 'llena', 'llena'], ingreso: "Ninguno (Espera de espacio)", despacho: "Cámara 9 (Segundo día)", despachosAcumulados: 4, balance: "Finaliza despacho de Cámara 9. Rotación exacta de posiciones." },
+            
+            { dia: "Día 25", estados: ['llena', 'vacía', 'vacía', 'llena', 'llena', 'llena'], ingreso: "Cámara 9 (Primer día)", despacho: "Ninguno", despachosAcumulados: 4, balance: "Re-ingreso de fruta en Cámara 9." },
+            { dia: "Día 26", estados: ['llena', 'vacía', 'vacía', 'llena', 'llena', 'llena'], ingreso: "Cámara 9 (Segundo día)", despacho: "Ninguno", despachosAcumulados: 4, balance: "Finaliza llenado de Cámara 9. El stock retenido cumple su ventana de tiempo." },
+            
+            { dia: "Día 27", estados: ['llena', 'vaciando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Ninguno (Espera de espacio)", despacho: "Cámara 8 (Primer día)", despachosAcumulados: 4, balance: "Se inicia despacho interplanta de Cámara 8 por orden secuencial FIFO." },
+            { dia: "Día 28", estados: ['llena', 'vaciando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Ninguno (Espera de espacio)", despacho: "Cámara 8 (Segundo día)", despachosAcumulados: 5, balance: "Finaliza despacho de Cámara 8. Liberación de espacio físico de frío." },
+            
+            { dia: "Día 29", estados: ['llena', 'vacía', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 8 (Primer día)", despacho: "Ninguno", despachosAcumulados: 5, balance: "Re-ingreso de fruta en Cámara 8." },
+            { dia: "Día 30", estados: ['llena', 'vacía', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 8 (Segundo día)", despacho: "Ninguno", despachosAcumulados: 5, balance: "Estabilidad mensual confirmada. El ciclo de una cámara libre absorbe el flujo continuo." }
         ];
 
         function renderizarReloj() {
@@ -233,7 +236,7 @@
 
                 contenedor.innerHTML += `
                     <div class="camara-node pos-${index} ${shadowGlow} w-[76px] h-[76px] sm:w-[94px] sm:h-[94px] border rounded-2xl flex flex-col items-center justify-center p-1.5 text-center select-none ${cardEstilos}">
-                        <span class="text-[8px] sm:text-[9px] uppercase tracking-widest opacity-50 font-bold">Cam</span>
+                        <span class="text-[8px] sm:text-[9px] uppercase tracking-widest opacity-50 font-bold">Cámara</span>
                         <span class="text-xl sm:text-2xl font-black tracking-tight my-0.5">${num}</span>
                         <span class="text-[7px] sm:text-[8px] px-1.5 py-0.5 rounded font-extrabold tracking-wide ${badgeEstilos}">${textoEstado}</span>
                     </div>
@@ -253,14 +256,15 @@
             
             document.getElementById('kpi-ocupacion').innerText = `${porcentaje}%`;
             document.getElementById('kpi-libres').innerText = vacias;
+            document.getElementById('kpi-contador-despachos').innerText = datos.despachosAcumulados;
 
             const kpiInterplanta = document.getElementById('kpi-interplanta');
             if (estados.includes('vaciando')) {
                 kpiInterplanta.innerText = "ACTIVO";
-                kpiInterplanta.className = "text-[10px] font-black bg-amber-500 text-slate-900 px-2 py-0.5 rounded mt-1 block animate-pulse tracking-wide truncate w-full max-w-[95px]";
+                kpiInterplanta.className = "text-[10px] font-black bg-amber-500 text-slate-900 px-2 py-0.5 rounded mt-1 block animate-pulse tracking-wide text-center w-full";
             } else {
                 kpiInterplanta.innerText = "STANDBY";
-                kpiInterplanta.className = "text-[10px] font-bold bg-slate-100 text-slate-400 px-2 py-0.5 rounded mt-1 block tracking-wide truncate w-full max-w-[95px]";
+                kpiInterplanta.className = "text-[10px] font-bold bg-slate-100 text-slate-400 px-2 py-0.5 rounded mt-1 block tracking-wide text-center w-full";
             }
 
             document.getElementById('contador-dias').innerText = datos.dia;
