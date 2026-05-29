@@ -63,11 +63,11 @@
                     
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-4 pb-4 border-b border-slate-100">
                         <div class="p-1 bg-slate-100 rounded-lg border border-slate-200/60 w-full sm:w-auto flex flex-row">
-                            <button id="btn-modo-real" onclick="cambiarModo('real')" class="px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40 whitespace-nowrap">
-                                1 Cámara (Real)
+                            <button id="btn-modo-real" onclick="cambiarModo('real')" class="px-4 py-1.5 rounded-md text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40 whitespace-nowrap">
+                                1 Cámara
                             </button>
-                            <button id="btn-modo-ideal" onclick="cambiarModo('ideal')" class="px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50 whitespace-nowrap">
-                                2 Cámaras (Ideal)
+                            <button id="btn-modo-ideal" onclick="cambiarModo('ideal')" class="px-4 py-1.5 rounded-md text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50 whitespace-nowrap">
+                                2 Cámaras
                             </button>
                         </div>
                         
@@ -188,11 +188,11 @@
             const btnIdeal = document.getElementById('btn-modo-ideal');
             
             if (modo === 'real') {
-                btnReal.className = "px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40 whitespace-nowrap";
-                btnIdeal.className = "px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50 whitespace-nowrap";
+                btnReal.className = "px-4 py-1.5 rounded-md text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40 whitespace-nowrap";
+                btnIdeal.className = "px-4 py-1.5 rounded-md text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50 whitespace-nowrap";
             } else {
-                btnIdeal.className = "px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40 whitespace-nowrap";
-                btnReal.className = "px-3 py-1.5 rounded-md text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50 whitespace-nowrap";
+                btnIdeal.className = "px-4 py-1.5 rounded-md text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40 whitespace-nowrap";
+                btnReal.className = "px-4 py-1.5 rounded-md text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50 whitespace-nowrap";
             }
             
             renderizarReloj();
@@ -256,11 +256,11 @@
             contenedorDatos.innerHTML = `
                 <div>
                     <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Flujo de Ingreso:</span>
-                    <span class="text-xs md:text-sm font-bold text-slate-800 flex items-center gap-1">🚚 ${datos.ingreso}</span>
+                    <span class="text-xs md:text-sm font-bold text-slate-800 flex items-center gap-1">🔄 ${datos.ingreso}</span>
                 </div>
                 <div>
                     <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Tránsito Interplantas:</span>
-                    <span class="text-xs md:text-sm font-bold text-slate-800 flex items-center gap-1">🔄 ${datos.despacho}</span>
+                    <span class="text-xs md:text-sm font-bold text-slate-800 flex items-center gap-1">🚚 ${datos.despacho}</span>
                 </div>
             `;
         }
