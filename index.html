@@ -25,7 +25,7 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
-        /* Posiciones en sentido HORARIO de las cámaras 6 a 11 (12, 2, 4, 6, 8, 10 en punto) */
+        /* Posiciones en sentido HORARIO (Cámaras 6 a 11) */
         .pos-0 { top: 12%; left: 50%; }   /* Cámara 6 */
         .pos-1 { top: 31%; left: 83%; }   /* Cámara 7 */
         .pos-2 { top: 69%; left: 83%; }   /* Cámara 8 */
@@ -33,7 +33,6 @@
         .pos-4 { top: 69%; left: 17%; }   /* Cámara 10 */
         .pos-5 { top: 31%; left: 17%; }   /* Cámara 11 */
 
-        /* Animación invertida para indicar el flujo de ingreso físico antihorario */
         @keyframes spin-reverse {
             from { transform: rotate(360deg); }
             to { transform: rotate(0deg); }
@@ -80,7 +79,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
-                            Progreso Operativo
+                            Simulación de Capacidad Mensual
                         </h2>
                         <span id="contador-dias" class="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-200">Estado Inicial</span>
                     </div>
@@ -101,7 +100,7 @@
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-600"></div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm" id="datos-operacion">
                             <div class="col-span-1 sm:col-span-2 text-slate-400 italic text-center py-2">
-                                Presioná "Avanzar Día" para iniciar la simulación dinámica de balance de masa.
+                                Presioná "Avanzar Día" para iniciar el recorrido mensual dinámico.
                             </div>
                         </div>
                     </div>
@@ -149,83 +148,39 @@
         const camarasConfig = [6, 7, 8, 9, 10, 11];
         let diaActual = 0;
 
-        /* CRONOGRAMA CORREGIDO: Balance de masa exacto de 48hs por fase y recorrido extendido */
+        /* CRONOGRAMA COMPLETO: 30 Días de Balance de Masa Sincronizado */
         const cronogramaDias = [
-            {
-                dia: "Estado Inicial",
-                estados: ['vacía', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
-                ingreso: "Ninguno", despacho: "Ninguno", balance: "Pulmón técnico vacío. 100% de la capacidad disponible."
-            },
-            {
-                dia: "Día 1",
-                estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
-                ingreso: "Cámara 6 (Fase Inicial 24h)", despacho: "Inactivo", balance: "Absorbiendo primeras líneas de producción."
-            },
-            {
-                dia: "Día 2",
-                estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'],
-                ingreso: "Cámara 6 (Fase Final 48h)", despacho: "Inactivo", balance: "Consolidando masa de producto para estabilización térmica."
-            },
-            {
-                dia: "Día 3",
-                estados: ['llena', 'vacía', 'vacía', 'vacía', 'vacía', 'llenando'],
-                ingreso: "Cámara 11 (Fase Inicial 24h)", despacho: "Inactivo", balance: "Cámara 6 completada. Rotación de flujo en sentido antihorario a Cam 11."
-            },
-            {
-                dia: "Día 4",
-                estados: ['llena', 'vacía', 'vacía', 'vacía', 'vacía', 'llenando'],
-                ingreso: "Cámara 11 (Fase Final 48h)", despacho: "Inactivo", balance: "Llenado balanceado de la segunda unidad del pool."
-            },
-            {
-                dia: "Día 5",
-                estados: ['llena', 'vacía', 'vacía', 'vacía', 'llenando', 'llena'],
-                ingreso: "Cámara 10 (Fase Inicial 24h)", despacho: "Inactivo", balance: "Cámara 11 completa. Progresión del frente de producción hacia Cámara 10."
-            },
-            {
-                dia: "Día 6",
-                estados: ['llena', 'vacía', 'vacía', 'vacía', 'llenando', 'llena'],
-                ingreso: "Cámara 10 (Fase Final 48h)", despacho: "Inactivo", balance: "Ocupación de la capacidad estática al 50%."
-            },
-            {
-                dia: "Día 7",
-                estados: ['llena', 'vacía', 'vacía', 'llenando', 'llena', 'llena'],
-                ingreso: "Cámara 9 (Fase Inicial 24h)", despacho: "Inactivo", balance: "Asignación de volumen en Cámara 9. Próximo a umbral crítico."
-            },
-            {
-                dia: "Día 8",
-                estados: ['vaciando', 'vacía', 'vacía', 'llenando', 'llena', 'llena'],
-                ingreso: "Cámara 9 (Fase Final 48h)", despacho: "Cámara 6 (Inicio evacuación)", balance: "<strong>Punto de quiebre</strong>: Se activa tracción interplanta en Cámara 6 para evitar parada de línea."
-            },
-            {
-                dia: "Día 9",
-                estados: ['vaciando', 'vacía', 'llenando', 'llena', 'llena', 'llena'],
-                ingreso: "Cámara 8 (Fase Inicial 24h)", despacho: "Cámara 6 (Fase Final despacho)", balance: "Evacuación de Cámara 6 balancea de manera exacta el ingreso de masa en Cámara 8."
-            },
-            {
-                dia: "Día 10",
-                estados: ['vacía', 'vacía', 'llenando', 'llena', 'llena', 'llena'],
-                ingreso: "Cámara 8 (Fase Final 48h)", despacho: "Inactivo momentáneo", balance: "Cámara 6 liberada y disponible. Stock en tránsito consolidado en destino."
-            },
-            {
-                dia: "Día 11",
-                estados: ['vacía', 'llenando', 'llena', 'llena', 'llena', 'llena'],
-                ingreso: "Cámara 7 (Fase Inicial 24h)", despacho: "Inactivo", balance: "Se explota el buffer remanente en Cámara 7 antes de reactivar despacho FIFO."
-            },
-            {
-                dia: "Día 12",
-                estados: ['vacía', 'llenando', 'llena', 'llena', 'llena', 'vaciando'],
-                ingreso: "Cámara 7 (Fase Final 48h)", despacho: "Cámara 11 (Inicio evacuación)", balance: "Saturación preventiva. Comienza vaciado de Cámara 11 según cola secuencial."
-            },
-            {
-                dia: "Día 13",
-                estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'],
-                ingreso: "Cámara 6 (Re-ingreso 24h)", despacho: "Cámara 11 (Fase Final)", balance: "Cierre del ciclo cerrado. Reinicio de llenado en Cámara 6."
-            },
-            {
-                dia: "Día 14",
-                estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vacía'],
-                ingreso: "Cámara 6 (Fase Final)", despacho: "Inactivo", balance: "<strong>Estabilidad de régimen permanente</strong>: El ritmo de planta y logística corren sincronizados."
-            }
+            { dia: "Estado Inicial", estados: ['vacía', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Ninguno", despacho: "Ninguno", balance: "Pulmón técnico vacío. 100% disponible." },
+            { dia: "Día 1", estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 6 (Fase Inicial)", despacho: "Inactivo", balance: "Absorbiendo el lote de entrada inicial." },
+            { dia: "Día 2", estados: ['llenando', 'vacía', 'vacía', 'vacía', 'vacía', 'vacía'], ingreso: "Cámara 6 (Fase Final)", despacho: "Inactivo", balance: "Consolidando masa de stock en Cámara 6." },
+            { dia: "Día 3", estados: ['llena', 'vacía', 'vacía', 'vacía', 'vacía', 'llenando'], ingreso: "Cámara 11 (Fase Inicial)", despacho: "Inactivo", balance: "Cámara 6 completa. Rotación antihoraria a Cámara 11." },
+            { dia: "Día 4", estados: ['llena', 'vacía', 'vacía', 'vacía', 'vacía', 'llenando'], ingreso: "Cámara 11 (Fase Final)", despacho: "Inactivo", balance: "Llenado balanceado de la segunda unidad." },
+            { dia: "Día 5", estados: ['llena', 'vacía', 'vacía', 'vacía', 'llenando', 'llena'], ingreso: "Cámara 10 (Fase Inicial)", despacho: "Inactivo", balance: "Cámara 11 completa. Flujo pasa a Cámara 10." },
+            { dia: "Día 6", estados: ['llena', 'vacía', 'vacía', 'vacía', 'llenando', 'llena'], ingreso: "Cámara 10 (Fase Final)", despacho: "Inactivo", balance: "Ocupación estática de planta al 50%." },
+            { dia: "Día 7", estados: ['llena', 'vacía', 'vacía', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9 (Fase Inicial)", despacho: "Inactivo", balance: "Asignación de volumen en Cámara 9." },
+            { dia: "Día 8", estados: ['vaciando', 'vacía', 'vacía', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9 (Fase Final)", despacho: "Cámara 6 (Inicio FIFO)", balance: "<strong>Punto de quiebre</strong>: Se activa tracción interplanta en Cámara 6." },
+            { dia: "Día 9", estados: ['vaciando', 'vacía', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8 (Fase Inicial)", despacho: "Cámara 6 (Fase Final)", balance: "Evacuación de Cámara 6 equilibra el ingreso a Cámara 8." },
+            { dia: "Día 10", estados: ['vacía', 'vacía', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8 (Fase Final)", despacho: "Inactivo", balance: "Cámara 6 liberada. Queda disponible como pool de reserva." },
+            { dia: "Día 11", estados: ['vacía', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7 (Fase Inicial)", despacho: "Inactivo", balance: "Explotando buffer remanente en Cámara 7." },
+            { dia: "Día 12", estados: ['vacía', 'llenando', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 7 (Fase Final)", despacho: "Cámara 11 (Inicio FIFO)", balance: "Comienza evacuación de Cámara 11 según cola secuencial." },
+            { dia: "Día 13", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6 (Re-ingreso)", despacho: "Cámara 11 (Fase Final)", balance: "Re-ingreso a Cámara 6 por ciclo cerrado antihorario." },
+            { dia: "Día 14", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vacía'], ingreso: "Cámara 6 (Fase Final)", despacho: "Inactivo", balance: "Cámara 11 liberada al pool de disponibilidad." },
+            { dia: "Día 15", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11 (Re-ingreso)", despacho: "Cámara 10 (Inicio FIFO)", balance: "Rotación activa. Tracción de despacho pasa a Cámara 10." },
+            { dia: "Día 16", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11 (Fase Final)", despacho: "Cámara 10 (Fase Final)", balance: "Régimen balanceado continuo interplanta." },
+            { dia: "Día 17", estados: ['llena', 'llena', 'llena', 'vaciando', 'vacía', 'llena'], ingreso: "Ninguno (Buffer)", despacho: "Cámara 9 (Inicio FIFO)", balance: "Cámara 10 liberada. Despacho secuencial de Cámara 9." },
+            { dia: "Día 18", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10 (Re-ingreso)", despacho: "Cámara 9 (Fase Final)", balance: "Producción toma Cámara 10 nuevamente." },
+            { dia: "Día 19", estados: ['llena', 'llena', 'llena', 'vacía', 'llenando', 'llena'], ingreso: "Cámara 10 (Fase Final)", despacho: "Inactivo", balance: "Cámara 9 liberada. Estabilización de stock retenido." },
+            { dia: "Día 20", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9 (Re-ingreso)", despacho: "Cámara 8 (Inicio FIFO)", balance: "Despacho de Cámara 8 mitiga acumulación mensual." },
+            { dia: "Día 21", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9 (Fase Final)", despacho: "Cámara 8 (Fase Final)", balance: "Tránsito interplanta coordinado de alta eficiencia." },
+            { dia: "Día 22", estados: ['llena', 'vaciando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Ninguno (Buffer)", despacho: "Cámara 7 (Inicio FIFO)", balance: "Cámara 8 liberada. Selección FIFO de Cámara 7." },
+            { dia: "Día 23", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8 (Re-ingreso)", despacho: "Cámara 7 (Fase Final)", balance: "Ingreso balanceado de fin de mes en lote 8." },
+            { dia: "Día 24", estados: ['llena', 'vacía', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8 (Fase Final)", despacho: "Inactivo", balance: "Cámara 7 liberada con éxito al pool técnico." },
+            { dia: "Día 25", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7 (Re-ingreso)", despacho: "Cámara 6 (Inicio FIFO)", balance: "Ciclo mensual completo: Cámara 6 vuelve a despacho." },
+            { dia: "Día 26", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7 (Fase Final)", despacho: "Cámara 6 (Fase Final)", balance: "Sincronización exacta de tasas operativas." },
+            { dia: "Día 27", estados: ['vacía', 'llena', 'llena', 'llena', 'llena', 'llenando'], ingreso: "Cámara 11 (Re-ingreso)", despacho: "Inactivo", balance: "Cámara 6 liberada. Destino limpia colas de espera." },
+            { dia: "Día 28", estados: ['vacía', 'llena', 'llena', 'llena', 'llena', 'llenando'], ingreso: "Cámara 11 (Fase Final)", despacho: "Inactivo", balance: "Preparación de buffers para el cierre de período." },
+            { dia: "Día 29", estados: ['vacía', 'llena', 'llena', 'llena', 'vaciando', 'llena'], ingreso: "Ninguno (Buffer)", despacho: "Cámara 10 (Inicio FIFO)", balance: "Despacho preventivo para asegurar espacio de bacheo." },
+            { dia: "Día 30", estados: ['llenando', 'llena', 'llena', 'llena', 'vaciando', 'llena'], ingreso: "Cámara 6 (Re-ingreso)", despacho: "Cámara 10 (Fase Final)", balance: "<strong>Estabilidad Mensual Lograda</strong>: El ciclo cerrado absorbió el 100% de la masa sin saturación." }
         ];
 
         function renderizarReloj() {
