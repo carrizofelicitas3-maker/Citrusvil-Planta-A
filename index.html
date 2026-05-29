@@ -32,12 +32,12 @@
         .pos-4 { top: 69%; left: 17%; }   /* Cámara 10 */
         .pos-5 { top: 31%; left: 17%; }   /* Cámara 11 */
 
-        @keyframes spin-reverse {
-            from { transform: rotate(360deg); }
-            to { transform: rotate(0deg); }
+        @keyframes spin-clockwise {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
-        .animate-spin-reverse {
-            animation: spin-reverse 20s linear infinite;
+        .animate-spin-clockwise {
+            animation: spin-clockwise 20s linear infinite;
         }
     </style>
 </head>
@@ -46,12 +46,12 @@
     <div class="max-w-6xl mx-auto p-4 md:p-8">
         
         <header class="border-b border-slate-200 pb-5 mb-6">
-            <div class="flex items-center gap-2">
-                <span class="bg-emerald-700 text-white text-[10px] font-black px-2.5 py-0.5 rounded tracking-wider">CITRUSVIL</span>
-                <span class="text-slate-400 text-xs font-bold tracking-wider">PLANTA A</span>
+            <div class="flex items-baseline gap-3">
+                <span class="text-2xl md:text-3xl font-black text-emerald-700 tracking-wider">CITRUSVIL</span>
+                <span class="text-lg md:text-xl font-bold text-slate-400 tracking-wide">| PLANTA A</span>
             </div>
-            <h1 class="text-xl md:text-2xl font-black text-slate-900 mt-1 tracking-tight">
-                Análisis predictivo de ocupación de cámaras de frío 6 a 11
+            <h1 class="text-xl md:text-2xl font-extrabold text-slate-900 mt-2 tracking-tight">
+                Dinámica de almacenamiento en cámaras de frío
             </h1>
         </header>
 
@@ -61,7 +61,7 @@
                 
                 <div class="grid grid-cols-3 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
                     <div class="text-center border-r border-slate-100">
-                        <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Ocupación Planta</span>
+                        <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Ocupación de Cámaras</span>
                         <span id="kpi-ocupacion" class="text-lg md:text-2xl font-black text-indigo-600">83%</span>
                     </div>
                     <div class="text-center border-r border-slate-100">
@@ -109,8 +109,8 @@
                     
                     <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-white border border-slate-200 flex flex-col items-center justify-center text-center p-2 z-10 shadow-sm">
                         <span class="text-[8px] sm:text-[9px] text-slate-400 font-bold tracking-widest">INGRESO</span>
-                        <span class="text-[10px] sm:text-xs font-black text-indigo-600 tracking-wider">ANTIHORARIO</span>
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500 mt-1 animate-spin-reverse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <span class="text-[10px] sm:text-xs font-black text-indigo-600 tracking-wider">HORARIO</span>
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-500 mt-1 animate-spin-clockwise" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17" />
                         </svg>
                     </div>
@@ -144,52 +144,52 @@
         const camarasConfig = [6, 7, 8, 9, 10, 11];
         let diaActual = 0;
 
-        /* CRONOGRAMA FIJO 83% REVISADO: Se eliminaron los estados vacíos erróneos */
+        /* CRONOGRAMA FIJO 83% REVISADO CON TEXTO MEJORADO */
         const cronogramaDias = [
-            { dia: "Día 1", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 2", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 1", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 2", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 3", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 4", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 3", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 4", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 5", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 6", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 5", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 6", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 7", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 8", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 7", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 8", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 9", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 10", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 9", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 10", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 11", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 12", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 11", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 12", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 13", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 14", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 13", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 14", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 15", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 16", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 15", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 16", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 17", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 18", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 17", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 18", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 19", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 20", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 19", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 20", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 21", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 22", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 21", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 22", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 23", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 24", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 23", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 24", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 25", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 26", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 25", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 26", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 27", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 28", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Corte de balance de masa equilibrado en régimen permanente." },
+            { dia: "Día 27", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 28", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
             
-            { dia: "Día 29", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Corte de balance de masa equilibrado en régimen permanente." },
-            { dia: "Día 30", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Corte de balance de masa equilibrado en todas las posiciones." }
+            { dia: "Día 29", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
+            { dia: "Día 30", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Monitoreo mensual completo: estabilidad y fluidez en el anillo de cámaras." }
         ];
 
         function renderizarReloj() {
@@ -244,7 +244,7 @@
             const contenedorDatos = document.getElementById('datos-operacion');
             contenedorDatos.innerHTML = `
                 <div>
-                    <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Flujo de Ingreso (Antihorario):</span>
+                    <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Flujo de Ingreso (Horario):</span>
                     <span class="text-xs md:text-sm font-bold text-slate-800">${datos.ingreso}</span>
                 </div>
                 <div>
