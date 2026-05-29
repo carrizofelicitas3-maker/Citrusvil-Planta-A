@@ -55,8 +55,25 @@
             </h1>
         </header>
 
+        <!-- CONFIGURACIÓN DE ESCENARIOS OPERATIVOS -->
+        <div class="mb-6 bg-white border border-slate-200 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Configuración del Margen de Maniobra Logística</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Seleccioná el nivel de disponibilidad objetivo para evaluar el comportamiento del flujo.</p>
+            </div>
+            <div class="flex gap-2 p-1 bg-slate-100 rounded-xl border border-slate-200/60 self-start sm:self-center">
+                <button id="btn-modo-real" onclick="cambiarModo('real')" class="px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40">
+                    1 Disponible (Escenario Real - 83%)
+                </button>
+                <button id="btn-modo-ideal" onclick="cambiarModo('ideal')" class="px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50">
+                    2 Disponibles (Escenario Ideal - 66%)
+                </button>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             
+            <!-- CONTROLES Y MÉTRICAS -->
             <div class="lg:col-span-7 space-y-5">
                 
                 <div class="grid grid-cols-3 gap-3 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
@@ -69,7 +86,7 @@
                         <span id="kpi-libres" class="text-lg md:text-2xl font-black text-slate-700">1</span>
                     </div>
                     <div class="text-center px-1">
-                        <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Días con Interplanta</span>
+                        <span class="text-[9px] text-slate-400 block font-bold tracking-wider uppercase">Ciclos Ejecutados</span>
                         <span id="kpi-contador-despachos" class="text-lg md:text-2xl font-black text-emerald-600">1</span>
                     </div>
                 </div>
@@ -80,15 +97,16 @@
                             <span class="w-2 h-2 rounded-full bg-indigo-600"></span>
                             Simulación de Capacidad Mensual Sincronizada
                         </h2>
-                        <span id="contador-dias" class="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-200">Día 1</span>
+                        <span id="contador-dias" class="text-xs font-bold bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-full border border-slate-200">Paso 1</span>
                     </div>
 
+                    <!-- BOTONERA DE CONTROL HISTÓRICO -->
                     <div class="grid grid-cols-12 gap-2 mb-4">
                         <button onclick="retrocederDia()" class="col-span-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-2 rounded-xl transition flex items-center justify-center gap-1 cursor-pointer text-xs tracking-wide border border-slate-200/60">
                             <span>◀</span> Volver
                         </button>
                         <button id="btn-siguiente" onclick="avanzarDia()" class="col-span-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-md shadow-indigo-600/10 flex items-center justify-center gap-2 cursor-pointer text-xs md:text-sm tracking-wide">
-                            Avanzar Día <span>▶</span>
+                            Avanzar <span>▶</span>
                         </button>
                         <button onclick="reiniciarSimulacion()" class="col-span-3 bg-slate-50 hover:bg-slate-100 text-slate-500 font-medium py-3 px-2 rounded-xl transition cursor-pointer text-xs border border-slate-200/40">
                             Reiniciar
@@ -98,11 +116,13 @@
                     <div class="p-4 bg-slate-50 rounded-xl border border-slate-200/60 relative overflow-hidden">
                         <div class="absolute left-0 top-0 bottom-0 w-1 bg-indigo-600"></div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm" id="datos-operacion">
-                            </div>
+                            <!-- Inyectado por JS -->
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- ANILLO VISUAL DE CÁMARAS -->
             <div class="lg:col-span-5 flex flex-col items-center bg-white border border-slate-200 p-4 md:p-6 rounded-2xl shadow-sm">
                 
                 <div class="clock-container my-4 bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner">
@@ -118,6 +138,7 @@
                     <div id="reloj-camaras" class="absolute inset-0 w-full h-full"></div>
                 </div>
 
+                <!-- REFERENCIAS -->
                 <div class="w-full grid grid-cols-2 gap-2 mt-2 pt-4 border-t border-slate-100 text-[10px] md:text-[11px] font-semibold text-slate-500">
                     <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200/60">
                         <div class="w-2.5 h-2.5 bg-white border border-slate-300 rounded"></div>
@@ -143,60 +164,59 @@
     <script>
         const camarasConfig = [6, 7, 8, 9, 10, 11];
         let diaActual = 0;
+        let modoActual = 'real'; // 'real' u 'ideal'
 
-        /* CRONOGRAMA FIJO 83% REVISADO CON TEXTO MEJORADO */
-        const cronogramaDias = [
-            { dia: "Día 1", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 2", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 3", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 4", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 5", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 6", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 7", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 8", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 9", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 10", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 11", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 12", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 13", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 14", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 15", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 16", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 17", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 18", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 19", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 20", estados: ['llena', 'llena', 'vaciando', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 8", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 21", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 22", estados: ['llena', 'vaciando', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 7", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 23", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 24", estados: ['vaciando', 'llenando', 'llena', 'llena', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 6", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 25", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 26", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 27", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 28", estados: ['llena', 'llena', 'llena', 'llena', 'vaciando', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 10", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            
-            { dia: "Día 29", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Sincronización de flujo continuo: tasa de ingreso alineada con la evacuación interplanta." },
-            { dia: "Día 30", estados: ['llena', 'llena', 'llena', 'vaciando', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 9", balance: "Monitoreo mensual completo: estabilidad y fluidez en el anillo de cámaras." }
+        /* ESCENARIO REAL (1 Disponible - Ocupación fija 83% - Sentido Horario Perfecto) */
+        const cronogramaReal = [
+            { paso: "Paso 1", estados: ['llenando', 'llena', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", camarasOk: "7, 8, 9, 10", obs: "Flujo activo: Llenado en Cámara 6 y despacho FIFO interplanta desde Cámara 11 de forma simultánea." },
+            { paso: "Paso 2", estados: ['llena', 'llenando', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 7", despacho: "Cámara 11", camarasOk: "6, 8, 9, 10", obs: "Rotación horaria: Línea de empaque pasa a Cámara 7 mientras continúa el despacho en Cámara 11." },
+            { paso: "Paso 3", estados: ['vaciando', 'llena', 'llenando', 'llena', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 6", camarasOk: "7, 9, 10, 11", obs: "Avance de bloque: Cámara 6 se abre para interplanta; el flujo de ingreso se desplaza a Cámara 8." },
+            { paso: "Paso 4", estados: ['vaciando', 'llena', 'llena', 'llenando', 'llena', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 6", camarasOk: "7, 8, 10, 11", obs: "Continuidad del ciclo: Cámara 9 recibe la producción en sintonía con la descarga de la Cámara 6." },
+            { paso: "Paso 5", estados: ['llena', 'vaciando', 'llena', 'llena', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 7", camarasOk: "6, 8, 9, 11", obs: "Siguiente fase: Liberación de Cámara 7 hacia Planta B y apertura de Cámara 10 para ingreso." },
+            { paso: "Paso 6", estados: ['llena', 'vaciando', 'llena', 'llena', 'llena', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 7", camarasOk: "6, 8, 9, 10", obs: "Transición horaria: El ingreso alcanza la Cámara 11; la evacuación de Cámara 7 sostiene el pulmón operativo." },
+            { paso: "Paso 7", estados: ['llena', 'llena', 'vaciando', 'llena', 'llena', 'llenando'], ingreso: "Cámara 11", despacho: "Cámara 8", camarasOk: "6, 7, 9, 10", obs: "Cierre de vuelta: Despacho FIFO migra a Cámara 8 manteniendo acopladas las tasas de movimiento." },
+            { paso: "Paso 8", estados: ['llenando', 'llena', 'vaciando', 'llena', 'llena', 'llena'], ingreso: "Cámara 6", despacho: "Cámara 8", camarasOk: "7, 9, 10, 11", obs: "Reinicio de anillo: El ingreso vuelve al origen en Cámara 6 coordinado con la salida de Cámara 8." },
+            { paso: "Paso 9", estados: ['llenando', 'llena', 'llena', 'vaciando', 'llena', 'llena'], ingreso: "Cámara 6", despacho: "Cámara 9", camarasOk: "7, 8, 10, 11", obs: "Estabilización del flujo: Cámara 9 inicia su vaciado interplanta liberando el espacio para los siguientes turnos." },
+            { paso: "Paso 10", estados: ['llena', 'llenando', 'llena', 'vaciando', 'llena', 'llena'], ingreso: "Cámara 7", despacho: "Cámara 9", camarasOk: "6, 8, 10, 11", obs: "Ciclo perpetuo: Ingreso en Cámara 7 y salida en Cámara 9. Capacidad controlada bajo el régimen de un buffer." }
         ];
+
+        /* ESCENARIO IDEAL (2 Disponibles - Ocupación fija 66% - Mayor flexibilidad logística) */
+        const cronogramaIdeal = [
+            { paso: "Paso 1", estados: ['llenando', 'vacía', 'llena', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 6", despacho: "Cámara 11", camarasOk: "8, 9, 10", obs: "Margen óptimo: Cámara 7 actúa como pulmón completamente vacío para mitigar picos imprevistos de producción." },
+            { paso: "Paso 2", estados: ['llena', 'llenando', 'vacía', 'llena', 'llena', 'vaciando'], ingreso: "Cámara 7", despacho: "Cámara 11", camarasOk: "6, 9, 10", obs: "Avance holgado: Ingreso en Cámara 7. Se genera ventana segura en Cámara 8 (vacía) por alta tasa interplanta." },
+            { paso: "Paso 3", estados: ['vaciando', 'llena', 'llenando', 'vacía', 'llena', 'llena'], ingreso: "Cámara 8", despacho: "Cámara 6", camarasOk: "7, 10, 11", obs: "Despacho holgado: Cámara 6 inicia evacuación rápida. Cámara 9 se mantiene libre como resguardo técnico." },
+            { paso: "Paso 4", estados: ['vaciando', 'llena', 'llena', 'llenando', 'vacía', 'llena'], ingreso: "Cámara 9", despacho: "Cámara 6", camarasOk: "7, 8, 11", obs: "Dinámica balanceada: Cámara 9 recibe fruta de empaque; la Cámara 10 queda liberada y lista en reserva." },
+            { paso: "Paso 5", estados: ['vacía', 'vaciando', 'llena', 'llena', 'llenando', 'llena'], ingreso: "Cámara 10", despacho: "Cámara 7", camarasOk: "8, 9, 11", obs: "Operación fluida: Entrada activa en Cámara 10, salida en Cámara 7. Cámara 6 queda vacía, garantizando flexibilidad total." }
+        ];
+
+        function getCronograma() {
+            return modoActual === 'real' ? cronogramaReal : cronogramaIdeal;
+        }
+
+        function cambiarModo(modo) {
+            modoActual = modo;
+            diaActual = 0;
+            
+            const btnReal = document.getElementById('btn-modo-real');
+            const btnIdeal = document.getElementById('btn-modo-ideal');
+            
+            if (modo === 'real') {
+                btnReal.className = "px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40";
+                btnIdeal.className = "px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50";
+            } else {
+                btnIdeal.className = "px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer bg-white text-indigo-600 shadow-sm border border-slate-200/40";
+                btnReal.className = "px-4 py-2 rounded-lg text-xs font-bold transition cursor-pointer text-slate-600 hover:bg-white/50";
+            }
+            
+            renderizarReloj();
+        }
 
         function renderizarReloj() {
             const contenedor = document.getElementById('reloj-camaras');
             contenedor.innerHTML = '';
 
-            const datosActuales = cronogramaDias[diaActual];
+            const cronograma = getCronograma();
+            const datosActuales = cronograma[diaActual];
             const estados = datosActuales.estados;
 
             camarasConfig.forEach((num, index) => {
@@ -236,10 +256,13 @@
         }
 
         function actualizarMetricas(datos) {
-            document.getElementById('kpi-ocupacion').innerText = `83%`;
-            document.getElementById('kpi-libres').innerText = `1`;
+            const ocupacionTxt = modoActual === 'real' ? '83%' : '66%';
+            const libresTxt = modoActual === 'real' ? '1' : '2';
+
+            document.getElementById('kpi-ocupacion').innerText = ocupacionTxt;
+            document.getElementById('kpi-libres').innerText = libresTxt;
             document.getElementById('kpi-contador-despachos').innerText = (diaActual + 1);
-            document.getElementById('contador-dias').innerText = datos.dia;
+            document.getElementById('contador-dias').innerText = datos.paso;
 
             const contenedorDatos = document.getElementById('datos-operacion');
             contenedorDatos.innerHTML = `
@@ -253,13 +276,14 @@
                 </div>
                 <div class="col-span-1 sm:col-span-2 pt-2 border-t border-slate-200 mt-1">
                     <span class="text-[10px] md:text-xs font-bold text-slate-400 block uppercase tracking-wider">Estado de Ocupación Dinámica:</span>
-                    <span class="text-xs md:text-sm font-medium text-slate-600">${datos.balance}</span>
+                    <span class="text-xs md:text-sm font-medium text-slate-600">${datos.obs}</span>
                 </div>
             `;
         }
 
         function avanzarDia() {
-            if (diaActual < cronogramaDias.length - 1) {
+            const cronograma = getCronograma();
+            if (diaActual < cronograma.length - 1) {
                 diaActual++;
             } else {
                 diaActual = 0; 
